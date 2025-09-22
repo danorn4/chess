@@ -1,5 +1,9 @@
 package chess;
 
+import chess.calculators.BishopMovesCalculator;
+import chess.calculators.KingMovesCalculator;
+import chess.calculators.PieceMovesCalculator;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -53,10 +57,20 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        ChessPiece piece = board.getPiece(myPosition);
-        if (piece.getPieceType() == PieceType.BISHOP) {
-            return List.of(new ChessMove(new ChessPosition(5, 4), new ChessPosition(1, 8), null));
+        // determine which MoveCalculator to use, according to pieceType
+        PieceMovesCalculator calculator;
+        switch(type) {
+            case BISHOP:
+                calculator = new BishopMovesCalculator();
+                break;
+            case KING:
+                calculator = new KingMovesCalculator();
+                break;
+            default:
+                return List.of();
         }
-        return  List.of();
+
+        return calculator.pieceMoves(board, myPosition);
+
     }
 }
