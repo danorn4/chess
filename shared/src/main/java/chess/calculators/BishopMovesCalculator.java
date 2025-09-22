@@ -4,12 +4,54 @@ import chess.ChessBoard;
 import chess.ChessMove;
 import chess.ChessPosition;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public class BishopMovesCalculator implements PieceMovesCalculator{
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return List.of(new ChessMove(new ChessPosition(5, 4), new ChessPosition(1, 8), null));
+        ArrayList<ChessMove> moves = new ArrayList<>();
+
+        // check moves top-right:
+        int row = myPosition.getRow() + 1;
+        int col = myPosition.getColumn() + 1;
+        while(row <= 8 && col <= 8) {
+            ChessPosition newPosition = new ChessPosition(row, col);
+            moves.add(new ChessMove(myPosition, newPosition, null));
+            row++;
+            col++;
+        }
+
+        // check moves top-left:
+        row = myPosition.getRow() + 1;
+        col = myPosition.getColumn() - 1;
+        while(row <= 8 && col > 0) {
+            ChessPosition newPosition = new ChessPosition(row, col);
+            moves.add(new ChessMove(myPosition, newPosition, null));
+            row++;
+            col--;
+        }
+
+        // check moves bottom-left:
+        row = myPosition.getRow() - 1;
+        col = myPosition.getColumn() - 1;
+        while(row > 0 && col > 0) {
+            ChessPosition newPosition = new ChessPosition(row, col);
+            moves.add(new ChessMove(myPosition, newPosition, null));
+            row--;
+            col--;
+        }
+
+        // check moves bottom-right:
+        row = myPosition.getRow() - 1;
+        col = myPosition.getColumn() + 1;
+        while(row > 0 && col <= 8) {
+            ChessPosition newPosition = new ChessPosition(row, col);
+            moves.add(new ChessMove(myPosition, newPosition, null));
+            row--;
+            col++;
+        }
+
+        return moves;
     }
 }
