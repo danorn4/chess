@@ -7,8 +7,12 @@ package chess;
  * signature of the existing methods.
  */
 public class ChessPosition {
+    private int x;
+    private int y;
 
     public ChessPosition(int row, int col) {
+        this.x = row;
+        this.y = col;
     }
 
     /**
@@ -16,7 +20,7 @@ public class ChessPosition {
      * 1 codes for the bottom row
      */
     public int getRow() {
-        throw new RuntimeException("Not implemented");
+        return x;
     }
 
     /**
@@ -24,6 +28,11 @@ public class ChessPosition {
      * 1 codes for the left row
      */
     public int getColumn() {
-        throw new RuntimeException("Not implemented");
+        return y;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("[%d, %d]", x, y);
     }
 }
