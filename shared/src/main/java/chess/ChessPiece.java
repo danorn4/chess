@@ -71,6 +71,12 @@ public class ChessPiece {
             case PAWN:
                 calculator = new PawnMovesCalculator();
                 break;
+            case QUEEN:
+                calculator = new QueenMovesCalculator();
+                break;
+            case ROOK:
+                calculator = new RookMovesCalculator();
+                break;
             default:
                 return List.of();
         }
