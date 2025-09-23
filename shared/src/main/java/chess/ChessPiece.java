@@ -1,9 +1,6 @@
 package chess;
 
-import chess.calculators.BishopMovesCalculator;
-import chess.calculators.KingMovesCalculator;
-import chess.calculators.KnightMovesCalculator;
-import chess.calculators.PieceMovesCalculator;
+import chess.calculators.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -70,6 +67,9 @@ public class ChessPiece {
                 break;
             case KNIGHT:
                 calculator = new KnightMovesCalculator();
+                break;
+            case PAWN:
+                calculator = new PawnMovesCalculator();
                 break;
             default:
                 return List.of();
