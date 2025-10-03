@@ -17,6 +17,27 @@ public class ChessBoard {
         // resetBoard();
     }
 
+    /** Deep Copy Constructor
+     *
+     * @param original board to copy
+     * copies each element of the original board
+     * onto a new one.
+     */
+    public ChessBoard(ChessBoard original) {
+        this.squares = new ChessPiece[8][8];
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                // ChessPosition is 1-indexed, arrays are 0-indexed
+                ChessPosition pos = new ChessPosition(row, col);
+                ChessPiece piece = original.getPiece(pos);
+                if (piece != null) {
+                    this.addPiece(pos, piece);
+                }
+            }
+        }
+    }
+
+
     /**
      * Adds a chess piece to the chessboard
      *
