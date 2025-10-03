@@ -16,10 +16,9 @@ import java.util.Collection;
 public class QueenMovesCalculator implements PieceMovesCalculator{
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        ArrayList<ChessMove> moves = new ArrayList<>();
 
         PieceMovesCalculator rookCalculator = new RookMovesCalculator();
-        moves.addAll(rookCalculator.pieceMoves(board, myPosition));
+        ArrayList<ChessMove> moves = new ArrayList<>(rookCalculator.pieceMoves(board, myPosition));
 
         PieceMovesCalculator bishopCalculator = new BishopMovesCalculator();
         moves.addAll(bishopCalculator.pieceMoves(board, myPosition));

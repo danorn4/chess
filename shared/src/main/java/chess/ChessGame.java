@@ -73,22 +73,45 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        boolean result = false;
-
+        // find king's position
         ChessPosition kingPos = findKing(teamColor);
 
-
-
-
-
-
-
-        return result;
+        // iterate through every piece, looking for possible enemies
+        for(int row = 1; row <= 8; row++) {
+            for(int col = 1; col <= 8; col++) {
+                ChessPosition currentPos = new ChessPosition(row, col);
+                ChessPiece currentPiece = board.getPiece(currentPos);
+                if(currentPiece != null && currentPiece.getTeamColor() != teamColor) {
+                    if(enemyAttacksKing(currentPos, currentPiece, kingPos)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
+    /**
+     * Custom helper function that checks if an enemy piece has the king in its path
+     * Helps isInCheck()
+     *
+     * @param currentPos position of enemy piece, we will iterate through the moves of this piece
+     * @param currentPiece enemy piece which is being checked
+     * @param kingPos position of current team king. if this king is in the enemy's path, return true
+     */
+    private boolean enemyAttacksKing(ChessPosition currentPos, ChessPiece currentPiece, ChessPosition kingPos) {
+        for(ChessMove move : currentPiece.pieceMoves(board, currentPos)) {
+            ChessPosition endPos = move.getEndPosition();
+            if(endPos.equals(kingPos)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Custom helper function to find the position of the king
+     * Helps isInCheck()
      *
      * @param teamColor which team to find the king for
      * @return ChessPosition position for the given team's king
@@ -107,8 +130,7 @@ public class ChessGame {
         }
         return null;
     }
-
-
+    
     /**
      * Determines if the given team is in checkmate
      *
