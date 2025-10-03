@@ -1,6 +1,5 @@
 package chess;
 
-import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -202,19 +201,7 @@ public class ChessGame {
         }
 
         // Condition 2 - current team MUST NOT have any valid moves left
-        for(int row = 1; row <= 8; row++) {
-            for(int col = 1; col <= 8; col++) {
-                ChessPosition currentPos = new ChessPosition(row, col);
-                ChessPiece currentPiece = board.getPiece(currentPos);
-                if(currentPiece != null && currentPiece.getTeamColor() == teamColor) {
-                    if(!validMoves(currentPos).isEmpty()) {
-                        return false;
-                    }
-
-                }
-            }
-        }
-        return true;
+        return hasNoMovesLeft(teamColor);
     }
 
     /**
@@ -229,13 +216,8 @@ public class ChessGame {
         if(isInCheck(teamColor)) {
             return false;
         }
-
         // condition 2 - current team MUST NOT have any valid moves left
-        if(!isInCheckmate(teamColor)) {
-            return false;
-        }
-
-        return true;
+        return hasNoMovesLeft(teamColor);
     }
 
     /**
@@ -244,19 +226,19 @@ public class ChessGame {
      * @param teamColor which team to check for
      * @return True if there is at least ONE valid move left for the given team
      */
-    private boolean teamMovesLeft(TeamColor teamColor) {
+    private boolean hasNoMovesLeft(TeamColor teamColor) {
         for(int row = 1; row <= 8; row++) {
             for(int col = 1; col <= 8; col++) {
                 ChessPosition currentPos = new ChessPosition(row, col);
                 ChessPiece currentPiece = board.getPiece(currentPos);
                 if(currentPiece != null && currentPiece.getTeamColor() == teamColor) {
                     if(!validMoves(currentPos).isEmpty()) {
-                        return true;
+                        return false;
                     }
                 }
             }
         }
-        return false;
+        return true;
     }
 
 
