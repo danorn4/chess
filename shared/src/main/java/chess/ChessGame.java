@@ -73,8 +73,41 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        boolean result = false;
+
+        ChessPosition kingPos = findKing(teamColor);
+
+
+
+
+
+
+
+        return result;
     }
+
+
+    /**
+     * Custom helper function to find the position of the king
+     *
+     * @param teamColor which team to find the king for
+     * @return ChessPosition position for the given team's king
+     */
+    private ChessPosition findKing(TeamColor teamColor) {
+        for(int row = 1; row <= 8; row++) {
+            for(int col = 1; col <= 8; col++) {
+                ChessPosition currentPos = new ChessPosition(row, col);
+                ChessPiece currentPiece = board.getPiece(currentPos);
+                if((currentPiece != null) &&
+                        (currentPiece.getTeamColor() == teamColor) &&
+                        (currentPiece.getPieceType() == ChessPiece.PieceType.KING)) {
+                    return currentPos;
+                }
+            }
+        }
+        return null;
+    }
+
 
     /**
      * Determines if the given team is in checkmate
