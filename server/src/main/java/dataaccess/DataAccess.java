@@ -9,11 +9,11 @@ import java.util.Collection;
 public interface DataAccess {
     void clear() throws DataAccessException;
 
-    void createUser(UserData user);
+    void createUser(UserData user) throws DataAccessException;
     UserData getUser(String username) throws DataAccessException;
 
     GameData createGame(String gameName) throws DataAccessException;
-    GameData getGame(String gameName) throws DataAccessException;
+    GameData getGame(int gameID) throws DataAccessException;
     Collection<GameData> listGames() throws DataAccessException;
     void updateGame(int gameID, GameData gameData) throws DataAccessException;
 
