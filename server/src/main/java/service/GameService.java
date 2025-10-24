@@ -15,7 +15,7 @@ public class GameService {
         this.dataAccess = dataAccess;
     }
 
-    private void authenticate(String authToken) throws DataAccessException {
+    private AuthData authenticate(String authToken) throws DataAccessException {
         if(authToken == null) {
             throw new DataAccessException("Error: unauthorized");
         }
@@ -25,6 +25,7 @@ public class GameService {
         if(auth == null) {
             throw new DataAccessException("Error: unauthorized");
         }
+        return auth;
     }
 
     public Collection<GameData> listGames(String authToken) throws DataAccessException {
@@ -45,9 +46,45 @@ public class GameService {
     }
 
     public void joinGame(String authToken, JoinGameRequest request) throws DataAccessException {
-        authenticate(authToken);
+        AuthData auth = authenticate(authToken);
+        String username = auth.username();
 
+        if(request.playerColor() == null) {
+            throw new DataAccessException("Error: bad request");
+        }
 
+        GameData game = dataAccess.getGame(request.gameID());
+
+        // WHITE LOGIC
+        if(request.playerColor().equals("WHITE")) {
+            if(game.whiteUsername() != null) {
+                throw new DataAccessException("Error: already taken");
+            }
+            GameData updatedGame = new GameData(
+                    request.gameID(),
+                    username,
+                    game.blackUsername(),
+                    game.gameName(),
+                    game.game()
+            );
+            dataAccess.updateGame(updatedGame.gameID(), updatedGame);
+        }
+        // BLACK LOGIC
+        else if(request.playerColor().equals("BLACK")) {
+            if(game.blackUsername() != null) {
+                throw new DataAccessException("Error: already taken");
+            }
+            GameData updatedGame = new GameData(
+                    request.gameID(),
+                    game.whiteUsername(),
+                    username,
+                    game.gameName(),
+                    game.game()
+            );
+            dataAccess.updateGame(updatedGame.gameID(), updatedGame);
+        } else {
+            throw new DataAccessException("Error: bad request");
+        }
     }
 
 
