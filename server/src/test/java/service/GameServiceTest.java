@@ -55,6 +55,11 @@ public class GameServiceTest {
 
         GameResult gameResult = gameService.createGame(auth.authToken(), gameName);
 
+        assertNotNull(gameResult);
+        assertEquals(1, gameResult.gameID());
 
+        GameData gameData = dataAccess.getGame(gameResult.gameID());
+        assertNotNull(gameData);
+        assertEquals("game 1", gameData.gameName());
     }
 }
