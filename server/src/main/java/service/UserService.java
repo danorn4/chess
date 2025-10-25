@@ -16,7 +16,7 @@ public class UserService {
 
     public AuthData register(UserData user) throws DataAccessException {
         if(user.username() == null || user.email() == null || user.password() == null){
-            throw new DataAccessException("Error: bad request.");
+            throw new DataAccessException("Error: bad request");
         } if(dataAccess.getUser(user.username()) != null){
             throw new DataAccessException("Error: already taken");
         }
@@ -28,7 +28,7 @@ public class UserService {
 
     public AuthData login(LoginRequest request) throws DataAccessException {
         if(request.username() == null || request.password() == null){
-            throw new DataAccessException("Error: bad request.");
+            throw new DataAccessException("Error: bad request");
         }
 
         UserData user = dataAccess.getUser(request.username());
@@ -46,7 +46,7 @@ public class UserService {
 
     public void logout(String authToken) throws DataAccessException {
         if(authToken == null){
-            throw new DataAccessException("Error: bad request.");
+            throw new DataAccessException("Error: bad request");
         }
         AuthData auth = dataAccess.getAuth(authToken);
         if(auth == null){

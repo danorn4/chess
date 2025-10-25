@@ -1,0 +1,108 @@
+package service;
+
+import dataaccess.DataAccess;
+import dataaccess.DataAccessException;
+import dataaccess.MemDataAcess;
+import model.AuthData;
+import model.UserData;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import service.RequestOrResponse.LoginRequest;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+public class UserServiceTests {
+    private DataAccess dataAccess;
+    private UserService userService;
+
+    @BeforeEach
+    public void setUp() throws DataAccessException {
+        dataAccess = new MemDataAcess();
+        userService = new UserService(dataAccess);
+    }
+
+    @Test
+    public void registerUserSuccess() throws DataAccessException {
+        UserData testUser = new UserData("player1", "password1", "p1@egmail.com");
+
+        AuthData auth = userService.register(testUser);
+
+        assertNotNull(auth);
+        assertNotNull(auth.authToken());
+        assertEquals("player1", auth.username());
+
+        UserData userDb = dataAccess.getUser("player1");
+        assertNotNull(userDb);
+        assertEquals("player1",  userDb.username());
+    }
+
+    @Test
+    public void registerUserFailsUserTaken() throws DataAccessException {
+        UserData existingUser = new UserData("player1", "password1", "p1@egmail.com");
+        dataAccess.createUser(existingUser);
+
+        UserData newUser = new UserData("player1", "password2", "p2@gmail.com");
+
+        DataAccessException e = assertThrows(DataAccessException.class, () -> userService.register(newUser));
+
+        assertEquals("Error: already taken",  e.getMessage());
+    }
+
+    @Test
+    public void loginSuccess()  throws DataAccessException {
+        UserData user = new UserData("player1", "password1", "p1@gmail.com");
+        dataAccess.createUser(user);
+
+        LoginRequest loginRequest = new LoginRequest(user.username(), user.password());
+
+        AuthData auth = userService.login(loginRequest);
+
+        assertNotNull(auth);
+        assertNotNull(auth.authToken());
+        assertEquals("player1", auth.username());
+    }
+
+    @Test
+    public void loginFailsWrongPassword() throws DataAccessException {
+        UserData user = new UserData("player1", "password1", "p1@gmail.com");
+        dataAccess.createUser(user);
+
+        LoginRequest loginRequest = new LoginRequest(user.username(), "WRONG PASSWORD");
+
+        DataAccessException e = assertThrows(DataAccessException.class, () -> userService.login(loginRequest));
+
+        assertEquals("Error: unauthorized",  e.getMessage());
+    }
+
+    @Test
+    public void loginFailsWrongUsername() throws DataAccessException {
+        UserData user = new UserData("player1", "password1", "p1@gmail.com");
+        dataAccess.createUser(user);
+
+        LoginRequest loginRequest = new LoginRequest(null, null);
+
+        DataAccessException e = assertThrows(DataAccessException.class, () -> userService.login(loginRequest));
+
+        assertEquals("Error: bad request",  e.getMessage());
+    }
+
+    @Test
+    public void logoutSuccess() throws DataAccessException {
+        AuthData auth = dataAccess.createAuth("player1");
+        assertNotNull(dataAccess.getAuth(auth.authToken()));
+
+        userService.logout(auth.authToken());
+
+        assertThrows(DataAccessException.class, () -> dataAccess.getAuth(auth.authToken()));
+
+    }
+
+    @Test
+    public void logoutFailsBadToken() {
+        String fakeToken = "fakeToken";
+
+        DataAccessException e = assertThrows(DataAccessException.class, () -> userService.logout(fakeToken));
+
+        assertEquals("Error: unauthorized", e.getMessage());
+    }
+}
