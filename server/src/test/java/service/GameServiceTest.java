@@ -44,22 +44,21 @@ public class GameServiceTest {
         DataAccessException e = assertThrows(DataAccessException.class, () -> {
             gameService.listGames("fake token");
         });
-
         assertEquals("Error: unauthorized",  e.getMessage());
     }
 
     @Test
-    public void createGameSuccess() throws DataAccessException {
-        AuthData auth = dataAccess.createAuth("user1");
-        String gameName = "game 1";
+    public void createGameSuccess() throws DataAccessException{
+        AuthData authData = dataAccess.createAuth("user1");
+        String gameName = "game1";
 
-        GameResult gameResult = gameService.createGame(auth.authToken(), gameName);
+        GameResult gameResult = gameService.createGame(authData.authToken(), gameName);
 
         assertNotNull(gameResult);
         assertEquals(1, gameResult.gameID());
 
         GameData gameData = dataAccess.getGame(gameResult.gameID());
         assertNotNull(gameData);
-        assertEquals("game 1", gameData.gameName());
+        assertEquals("game1", gameData.gameName());
     }
 }
