@@ -8,6 +8,7 @@ import model.GameData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.RequestOrResponse.GameResult;
+import service.RequestOrResponse.JoinGameRequest;
 
 import java.util.Collection;
 
@@ -61,4 +62,57 @@ public class GameServiceTest {
         assertNotNull(gameData);
         assertEquals("game1", gameData.gameName());
     }
+
+    @Test
+    public void createGameFailsBadToken() throws DataAccessException{
+        String gameName = "game1";
+
+        DataAccessException e = assertThrows(DataAccessException.class, () -> {
+            gameService.createGame("non-existent token", gameName);
+        });
+
+        assertEquals("Error: unauthorized", e.getMessage());
+    }
+
+    @Test
+    public void createGameFailsInvalidGameName() throws DataAccessException {
+        AuthData auth = dataAccess.createAuth("user1");
+        String gameName = "";
+
+        DataAccessException e = assertThrows(DataAccessException.class, () -> {
+            gameService.createGame(auth.authToken(), gameName);
+        });
+
+        assertEquals("Error: bad request", e.getMessage());
+    }
+
+    @Test
+    public void joinGameSuccess() throws DataAccessException {
+        AuthData auth = dataAccess.createAuth("user1");
+        GameData game = dataAccess.createGame("game1");
+
+        JoinGameRequest joinRequest;
+
+        joinRequest = new JoinGameRequest("WHITE", game.gameID());
+        DataAccessException e;
+
+        e = assertThrows(DataAccessException.class, () -> {
+            gameService.joinGame(auth.authToken(), joinRequest);
+        });
+
+        assertNull(e);
+
+
+    }
+
+    @Test
+    public void joinGameBlackSuccess() throws DataAccessException {
+        AuthData auth = dataAccess.createAuth("user1");
+        GameData game = dataAccess.createGame("game1");
+
+        JoinGameRequest joinRequest = new JoinGameRequest("BLACK", game.gameID());
+
+    }
+
+
 }
