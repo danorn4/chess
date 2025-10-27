@@ -88,30 +88,25 @@ public class GameServiceTest {
 
     @Test
     public void joinGameSuccess() throws DataAccessException {
-        AuthData auth = dataAccess.createAuth("user1");
+        AuthData auth1 = dataAccess.createAuth("user1");
+        AuthData auth2 = dataAccess.createAuth("user2:");
         GameData game = dataAccess.createGame("game1");
 
-        JoinGameRequest joinRequest;
-
-        joinRequest = new JoinGameRequest("WHITE", game.gameID());
-        DataAccessException e;
-
-        e = assertThrows(DataAccessException.class, () -> {
-            gameService.joinGame(auth.authToken(), joinRequest);
+        JoinGameRequest joinRequest1 = new JoinGameRequest("WHITE", game.gameID());
+        assertDoesNotThrow(() -> {
+            gameService.joinGame(auth1.authToken(), joinRequest1);
         });
 
-        assertNull(e);
+        JoinGameRequest joinRequest2 = new JoinGameRequest("BLACK", game.gameID());
+        assertDoesNotThrow(() -> {
+            gameService.joinGame(auth2.authToken(), joinRequest2);
+        });
 
+        GameData joinedGame = dataAccess.getGame(game.gameID());
 
-    }
-
-    @Test
-    public void joinGameBlackSuccess() throws DataAccessException {
-        AuthData auth = dataAccess.createAuth("user1");
-        GameData game = dataAccess.createGame("game1");
-
-        JoinGameRequest joinRequest = new JoinGameRequest("BLACK", game.gameID());
-
+        assertNotNull(joinedGame);
+        assertEquals(auth1.username(), joinedGame.whiteUsername());
+        assertEquals(auth2.username(), joinedGame.blackUsername());
     }
 
 
