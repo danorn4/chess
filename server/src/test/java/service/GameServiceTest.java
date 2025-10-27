@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.MemDataAcess;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import service.RequestOrResponse.GameResult;
 import service.RequestOrResponse.JoinGameRequest;
 
+import javax.xml.crypto.Data;
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -89,7 +91,7 @@ public class GameServiceTest {
     @Test
     public void joinGameSuccess() throws DataAccessException {
         AuthData auth1 = dataAccess.createAuth("user1");
-        AuthData auth2 = dataAccess.createAuth("user2:");
+        AuthData auth2 = dataAccess.createAuth("user2");
         GameData game = dataAccess.createGame("game1");
 
         JoinGameRequest joinRequest1 = new JoinGameRequest("WHITE", game.gameID());
@@ -107,6 +109,74 @@ public class GameServiceTest {
         assertNotNull(joinedGame);
         assertEquals(auth1.username(), joinedGame.whiteUsername());
         assertEquals(auth2.username(), joinedGame.blackUsername());
+    }
+
+    @Test
+    public void joinGameFailBadToken() throws DataAccessException {
+        GameData game = dataAccess.createGame("game");
+
+        JoinGameRequest joinRequest = new JoinGameRequest("WHITE", game.gameID());
+        DataAccessException e = assertThrows(DataAccessException.class, () -> {
+            gameService.joinGame("non-existent token", joinRequest);
+        });
+
+        assertEquals("Error: unauthorized", e.getMessage());
+    }
+
+    @Test
+    public void joinGameFailsWrongColor() throws DataAccessException {
+        AuthData auth1 = dataAccess.createAuth("user1");
+        GameData game = dataAccess.createGame("game");
+
+        DataAccessException e;
+
+        JoinGameRequest requestNullColor = new JoinGameRequest(null, game.gameID());
+        e = assertThrows(DataAccessException.class, () -> {
+            gameService.joinGame(auth1.authToken(), requestNullColor);
+        });
+        assertEquals("Error: bad request", e.getMessage());
+
+        JoinGameRequest requestWrongColor = new JoinGameRequest("BLUE", game.gameID());
+        e = assertThrows(DataAccessException.class, () -> {
+            gameService.joinGame(auth1.authToken(), requestWrongColor);
+        });
+        assertEquals("Error: bad request", e.getMessage());
+    }
+
+    @Test
+    public void joinGameFailsTaken() throws DataAccessException {
+        AuthData auth1 = dataAccess.createAuth("user1");
+        AuthData auth2 = dataAccess.createAuth("user2");
+        GameData game = dataAccess.createGame("game1");
+
+        GameData alreadyJoinedGame = new GameData(game.gameID(),
+                auth1.username(),
+                auth2.username(),
+                game.gameName(),
+                new ChessGame());
+
+        dataAccess.updateGame(alreadyJoinedGame.gameID(), alreadyJoinedGame);
+
+        JoinGameRequest request = new JoinGameRequest("WHITE", game.gameID());
+
+        DataAccessException e = assertThrows(DataAccessException.class, () -> {
+            gameService.joinGame(auth1.authToken(), request);
+        });
+
+        assertEquals("Error: already taken", e.getMessage());
+    }
+
+    @Test
+    public void joinGameFailsWrongGame() throws DataAccessException {
+        AuthData auth = dataAccess.createAuth("user1");
+
+        JoinGameRequest request = new JoinGameRequest("WHITE", 99999);
+
+        DataAccessException e = assertThrows(DataAccessException.class, () -> {
+            gameService.joinGame(auth.authToken(), request);
+        });
+
+        assertEquals("Game doesn't exist", e.getMessage());
     }
 
 
