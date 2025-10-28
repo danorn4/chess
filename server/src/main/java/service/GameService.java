@@ -45,7 +45,9 @@ public class GameService {
         AuthData auth = authenticate(authToken);
         String username = auth.username();
 
-        if(request.playerColor() == null) throw new DataAccessException("Error: bad request");
+        if(request.playerColor() == null) {
+            throw new DataAccessException("Error: bad request");
+        }
 
         GameData game = dataAccess.getGame(request.gameID());
 
