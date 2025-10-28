@@ -7,7 +7,7 @@ import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.RequestOrResponse.LoginRequest;
+import service.requestorresponse.LoginRequest;
 
 import static org.junit.jupiter.api.Assertions.*;
 

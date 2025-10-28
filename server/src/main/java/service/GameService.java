@@ -3,8 +3,8 @@ package service;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import model.*;
-import service.RequestOrResponse.GameResult;
-import service.RequestOrResponse.JoinGameRequest;
+import service.requestorresponse.GameResult;
+import service.requestorresponse.JoinGameRequest;
 
 import java.util.Collection;
 
@@ -16,10 +16,6 @@ public class GameService {
     }
 
     private AuthData authenticate(String authToken) throws DataAccessException {
-        if(authToken == null) {
-            throw new DataAccessException("Error: unauthorized");
-        }
-
         AuthData auth = dataAccess.getAuth(authToken);
 
         if(auth == null) {
@@ -49,9 +45,7 @@ public class GameService {
         AuthData auth = authenticate(authToken);
         String username = auth.username();
 
-        if(request.playerColor() == null) {
-            throw new DataAccessException("Error: bad request");
-        }
+        if(request.playerColor() == null) throw new DataAccessException("Error: bad request");
 
         GameData game = dataAccess.getGame(request.gameID());
 

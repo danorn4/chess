@@ -8,10 +8,9 @@ import model.AuthData;
 import model.GameData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.RequestOrResponse.GameResult;
-import service.RequestOrResponse.JoinGameRequest;
+import service.requestorresponse.GameResult;
+import service.requestorresponse.JoinGameRequest;
 
-import javax.xml.crypto.Data;
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -176,7 +175,7 @@ public class GameServiceTest {
             gameService.joinGame(auth.authToken(), request);
         });
 
-        assertEquals("Game doesn't exist", e.getMessage());
+        assertEquals("Error: Game doesn't exist", e.getMessage());
     }
 
 

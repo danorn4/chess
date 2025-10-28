@@ -53,7 +53,7 @@ public class MemDataAcess implements DataAccess {
     public GameData getGame(int gameID) throws DataAccessException {
         GameData gameData = games.get(gameID);
         if(gameData == null) {
-            throw new DataAccessException("Game doesn't exist");
+            throw new DataAccessException("Error: Game doesn't exist");
         }
         return gameData;
     }

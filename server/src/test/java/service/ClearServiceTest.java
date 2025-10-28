@@ -44,7 +44,7 @@ public class ClearServiceTest {
         DataAccessException e = assertThrows(DataAccessException.class, () -> {
             dataAccess.getGame(1);
         });
-        assertEquals("Game doesn't exist", e.getMessage());
+        assertEquals("Error: Game doesn't exist", e.getMessage());
 
 
 
