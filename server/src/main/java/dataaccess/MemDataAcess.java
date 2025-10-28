@@ -79,7 +79,7 @@ public class MemDataAcess implements DataAccess {
     @Override
     public AuthData createAuth(String username) throws DataAccessException {
         String authToken =  UUID.randomUUID().toString();
-        AuthData authData = new AuthData(authToken, username);
+        AuthData authData = new AuthData(username, authToken);
 
         auths.put(authToken, authData);
         return authData;
