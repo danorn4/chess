@@ -62,10 +62,10 @@ public class Server {
         try {
             clearService.clearApplication();
             ctx.status(200);
-            ctx.json(Map.of());
+            ctx.result(gson.toJson(Map.of()));
         } catch (Exception e) {
             ctx.status(500);
-            ctx.json(Map.of("message", String.format("Error: %s", e.getMessage())));
+            ctx.result(gson.toJson((Map.of("message", String.format("Error: %s", e.getMessage())))));
         }
     }
 
@@ -76,22 +76,22 @@ public class Server {
             AuthData auth = userService.register(user);
 
             ctx.status(200);
-            ctx.json(auth);
+            ctx.result(gson.toJson(auth));
         } catch (DataAccessException e) {
             String errorMessage = e.getMessage();
             if("Error: bad request".equals(errorMessage)){
                 ctx.status(400);
-                ctx.json(Map.of("message", String.format("Error: %s", errorMessage)));
+                ctx.result(gson.toJson((Map.of("message", String.format("Error: %s", errorMessage)))));
             } else if("Error: already taken".equals(errorMessage)){
                 ctx.status(403);
-                ctx.json(Map.of("message", String.format("Error: %s", errorMessage)));
+                ctx.result(gson.toJson((Map.of("message", String.format("Error: %s", errorMessage)))));
             } else {
                 ctx.status(500);
-                ctx.json(Map.of("message", String.format("Error: %s", errorMessage)));
+                ctx.result(gson.toJson((Map.of("message", String.format("Error: %s", errorMessage)))));
             }
         } catch (Exception e) {
             ctx.status(400);
-            ctx.json(Map.of("message", String.format("Error: %s", e.getMessage())));
+            ctx.result(gson.toJson((Map.of("message", String.format("Error: %s", e.getMessage())))));
         }
     }
 
@@ -101,22 +101,22 @@ public class Server {
             AuthData authData = userService.login(loginRequest);
 
             ctx.status(200);
-            ctx.json(authData);
+            ctx.result(gson.toJson(authData));
         } catch (DataAccessException e) {
             String errorMessage = e.getMessage();
             if("Error: bad request".equals(errorMessage)){
                 ctx.status(400);
-                ctx.json(Map.of("message", String.format("Error: %s", errorMessage)));
+                ctx.result(gson.toJson((Map.of("message", String.format("Error: %s", errorMessage)))));
             } else if("Error: unauthorized".equals(errorMessage)){
                 ctx.status(401);
-                ctx.json(Map.of("message", String.format("Error: %s", errorMessage)));
+                ctx.result(gson.toJson((Map.of("message", String.format("Error: %s", errorMessage)))));
             } else {
                 ctx.status(500);
-                ctx.json(Map.of("message", String.format("Error: %s", errorMessage)));
+                ctx.result(gson.toJson((Map.of("message", String.format("Error: %s", errorMessage)))));
             }
         } catch (Exception e) {
             ctx.status(400);
-            ctx.json(Map.of("message", String.format("Error: %s", e.getMessage())));
+            ctx.result(gson.toJson((Map.of("message", String.format("Error: %s", e.getMessage())))));
         }
     }
 
@@ -126,19 +126,19 @@ public class Server {
             userService.logout(authToken);
 
             ctx.status(200);
-            ctx.json(Map.of());
+            ctx.result(gson.toJson(Map.of()));
         } catch (DataAccessException e) {
             String errorMessage =  e.getMessage();
             if("Error: unauthorized".equals(errorMessage)){
                 ctx.status(401);
-                ctx.json(Map.of("message", String.format("Error: %s", errorMessage)));
+                ctx.result(gson.toJson((Map.of("message", String.format("Error: %s", errorMessage)))));
             } else {
                 ctx.status(500);
-                ctx.json(Map.of("message", String.format("Error: %s", errorMessage)));
+                ctx.result(gson.toJson((Map.of("message", String.format("Error: %s", errorMessage)))));
             }
         } catch (Exception e) {
             ctx.status(400);
-            ctx.json(Map.of("message", String.format("Error: %s", e.getMessage())));
+            ctx.result(gson.toJson((Map.of("message", String.format("Error: %s", e.getMessage())))));
         }
     }
 
@@ -148,19 +148,19 @@ public class Server {
             Collection<GameData> listGames = gameService.listGames(authToken);
 
             ctx.status(200);
-            ctx.json(Map.of("games", listGames));
+            ctx.result(gson.toJson(Map.of("games", listGames)));
         } catch(DataAccessException e) {
             String errorMessage = e.getMessage();
             if("Error: unauthorized".equals(errorMessage)){
                 ctx.status(401);
-                ctx.json(Map.of("message", String.format("Error: %s", errorMessage)));
+                ctx.result(gson.toJson((Map.of("message", String.format("Error: %s", errorMessage)))));
             } else {
                 ctx.status(500);
-                ctx.json(Map.of("message", String.format("Error: %s", errorMessage)));
+                ctx.result(gson.toJson((Map.of("message", String.format("Error: %s", errorMessage)))));
             }
         } catch (Exception e) {
             ctx.status(400);
-            ctx.json(Map.of("message", String.format("Error: %s", e.getMessage())));
+            ctx.result(gson.toJson((Map.of("message", String.format("Error: %s", e.getMessage())))));
         }
     }
 
@@ -171,22 +171,22 @@ public class Server {
             GameResult gameResult = gameService.createGame(authToken, createGameRequest.gameName());
 
             ctx.status(200);
-            ctx.json(gameResult);
+            ctx.result(gson.toJson((gameResult)));
         } catch(DataAccessException e) {
             String errorMessage = e.getMessage();
             if("Error: bad request".equals(errorMessage)){
                 ctx.status(400);
-                ctx.json(Map.of("message", String.format("Error: %s", errorMessage)));
+                ctx.result(gson.toJson((Map.of("message", String.format("Error: %s", errorMessage)))));
             } else if("Error: unauthorized".equals(errorMessage)){
                 ctx.status(401);
-                ctx.json(Map.of("message", String.format("Error: %s", errorMessage)));
+                ctx.result(gson.toJson((Map.of("message", String.format("Error: %s", errorMessage)))));
             } else {
                 ctx.status(500);
-                ctx.json(Map.of("message", String.format("Error: %s", errorMessage)));
+                ctx.result(gson.toJson((Map.of("message", String.format("Error: %s", errorMessage)))));
             }
         } catch (Exception e) {
             ctx.status(400);
-            ctx.json(Map.of("message", String.format("Error: %s", e.getMessage())));
+            ctx.result(gson.toJson((Map.of("message", String.format("Error: %s", e.getMessage())))));
         }
     }
 
@@ -198,30 +198,34 @@ public class Server {
             gameService.joinGame(authToken, joinGameRequest);
 
             ctx.status(200);
-            ctx.json(Map.of());
+            ctx.result(gson.toJson((Map.of())));
         } catch(DataAccessException e) {
             String errorMessage = e.getMessage();
             switch (errorMessage) {
                 case "Error: bad request" -> {
                     ctx.status(400);
-                    ctx.json(Map.of("message", String.format("Error: %s", errorMessage)));
+                    ctx.result(gson.toJson((Map.of("message", String.format("Error: %s", errorMessage)))));
                 }
                 case "Error: unauthorized" -> {
                     ctx.status(401);
-                    ctx.json(Map.of("message", String.format("Error: %s", errorMessage)));
+                    ctx.result(gson.toJson((Map.of("message", String.format("Error: %s", errorMessage)))));
                 }
                 case "Error: already taken" -> {
                     ctx.status(403);
-                    ctx.json(Map.of("message", String.format("Error: %s", errorMessage)));
+                    ctx.result(gson.toJson((Map.of("message", String.format("Error: %s", errorMessage)))));
+                }
+                case "Game doesn't exist" -> {
+                    ctx.status(400);
+                    ctx.result(gson.toJson(Map.of("message", String.format("Error: %s", errorMessage))));
                 }
                 case null, default -> {
                     ctx.status(500);
-                    ctx.json(Map.of("message", String.format("Error: %s", errorMessage)));
+                    ctx.result(gson.toJson((Map.of("message", String.format("Error: %s", errorMessage)))));
                 }
             }
         } catch (Exception e) {
             ctx.status(400);
-            ctx.json(Map.of("message", String.format("Error: %s", e.getMessage())));
+            ctx.result(gson.toJson((Map.of("message", String.format("Error: %s", e.getMessage())))));
         }
     }
 

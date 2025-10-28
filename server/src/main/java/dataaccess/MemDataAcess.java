@@ -33,11 +33,7 @@ public class MemDataAcess implements DataAccess {
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
-        if (!users.containsKey(username)) {
-            throw new DataAccessException("Username doesn't exist");
-        } else {
-            return users.get(username);
-        }
+        return users.get(username);
     }
 
     @Override
