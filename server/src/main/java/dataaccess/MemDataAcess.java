@@ -87,11 +87,7 @@ public class MemDataAcess implements DataAccess {
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
-        if (!auths.containsKey(authToken)) {
-            throw new  DataAccessException("Auth doesn't exist");
-        } else {
-            return auths.get(authToken);
-        }
+        return auths.get(authToken);
     }
 
     @Override

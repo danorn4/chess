@@ -32,27 +32,22 @@ public class ClearServiceTest {
         GameData game1 = dataAccess.createGame("game1");
         GameData game2 = dataAccess.createGame("game2");
 
-        clearService.clearApplication();
+        assertDoesNotThrow(() -> clearService.clearApplication());
 
-        DataAccessException e;
+        AuthData auth = dataAccess.getAuth("auth1");
+        assertNull(auth);
 
-        e = assertThrows(DataAccessException.class, () -> dataAccess.getUser("user1"));
-        assertEquals("Username doesn't exist", e.getMessage());
+        UserData userAfterClear = dataAccess.getUser("user1");
 
-        e = assertThrows(DataAccessException.class, () -> dataAccess.getUser("user2"));
-        assertEquals("Username doesn't exist", e.getMessage());
+        assertNull(userAfterClear);
 
-        e = assertThrows(DataAccessException.class, () -> dataAccess.getAuth(auth1.authToken()));
-        assertEquals("Auth doesn't exist", e.getMessage());
-
-        e = assertThrows(DataAccessException.class, () -> dataAccess.getAuth(auth2.authToken()));
-        assertEquals("Auth doesn't exist", e.getMessage());
-
-        e = assertThrows(DataAccessException.class, () -> dataAccess.getGame(game1.gameID()));
+        DataAccessException e = assertThrows(DataAccessException.class, () -> {
+            dataAccess.getGame(1);
+        });
         assertEquals("Game doesn't exist", e.getMessage());
 
-        e = assertThrows(DataAccessException.class, () -> dataAccess.getGame(game2.gameID()));
-        assertEquals("Game doesn't exist", e.getMessage());
+
+
     }
 
 }

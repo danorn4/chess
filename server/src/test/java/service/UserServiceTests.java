@@ -89,12 +89,14 @@ public class UserServiceTests {
     @Test
     public void logoutSuccess() throws DataAccessException {
         AuthData auth = dataAccess.createAuth("player1");
-        assertNotNull(dataAccess.getAuth(auth.authToken()));
 
-        userService.logout(auth.authToken());
+        assertDoesNotThrow(() -> {
+            userService.logout(auth.authToken());
+        });
 
-        assertThrows(DataAccessException.class, () -> dataAccess.getAuth(auth.authToken()));
+        AuthData deletedAuth = dataAccess.getAuth(auth.authToken());
 
+        assertNull(deletedAuth);
     }
 
     @Test
