@@ -12,10 +12,10 @@ import model.UserData;
 import org.jetbrains.annotations.NotNull;
 import service.ClearService;
 import service.GameService;
-import service.requestorresponse.CreateGameRequest;
-import service.requestorresponse.GameResult;
-import service.requestorresponse.JoinGameRequest;
-import service.requestorresponse.LoginRequest;
+import service.servicehelpers.CreateGameRequest;
+import service.servicehelpers.GameResult;
+import service.servicehelpers.JoinGameRequest;
+import service.servicehelpers.LoginRequest;
 import service.UserService;
 
 import java.util.Collection;
@@ -62,7 +62,7 @@ public class Server {
         javalin.stop();
     }
 
-    public void handleDataAccessException(DataAccessException e, Context ctx) {
+    private void handleDataAccessException(DataAccessException e, Context ctx) {
         String errorMessage = e.getMessage();
 
         if("Error: bad request".equals(errorMessage) ||
@@ -78,7 +78,7 @@ public class Server {
         }
     }
 
-    public void handleGenericException(Exception e, Context ctx) {
+    private void handleGenericException(Exception e, Context ctx) {
         ctx.status(500);
         ctx.result(gson.toJson(Map.of("message", String.format("Error: %s", e.getMessage()))));
 

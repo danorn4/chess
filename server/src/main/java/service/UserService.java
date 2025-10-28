@@ -4,7 +4,7 @@ import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import model.UserData;
 import model.AuthData;
-import service.requestorresponse.LoginRequest;
+import service.servicehelpers.LoginRequest;
 
 
 public class UserService {

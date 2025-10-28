@@ -3,8 +3,8 @@ package service;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import model.*;
-import service.requestorresponse.GameResult;
-import service.requestorresponse.JoinGameRequest;
+import service.servicehelpers.GameResult;
+import service.servicehelpers.JoinGameRequest;
 
 import java.util.Collection;
 
