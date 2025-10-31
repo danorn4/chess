@@ -39,7 +39,7 @@ public class SQLDataAccess implements DataAccess {
                         blackUsername VARCHAR(255),
                         gameName VARCHAR(255),
                         gameData TEXT NOT NULL
-                    )"""; 
+                    )""";
         }
     }
 
