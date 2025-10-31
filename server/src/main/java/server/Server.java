@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.MemDataAcess;
+import dataaccess.SQLDataAccess;
 import io.javalin.*;
 import io.javalin.http.Context;
 import model.AuthData;
@@ -34,7 +35,8 @@ public class Server {
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
-        DataAccess dataAccess = new MemDataAcess();
+        // DataAccess dataAccess = new MemDataAcess();
+        DataAccess dataAccess = new SQLDataAccess();
         this.userService = new UserService(dataAccess);
         this.gameService = new GameService(dataAccess);
         this.clearService = new ClearService(dataAccess);
