@@ -3,6 +3,7 @@ package service;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.MemDataAcess;
+import dataaccess.SQLDataAccess;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,8 +18,10 @@ public class UserServiceTests {
 
     @BeforeEach
     public void setUp() throws DataAccessException {
-        dataAccess = new MemDataAcess();
+        dataAccess = new SQLDataAccess();
         userService = new UserService(dataAccess);
+
+        dataAccess.clear();
     }
 
     @Test

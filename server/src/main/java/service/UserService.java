@@ -4,6 +4,7 @@ import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import model.UserData;
 import model.AuthData;
+import org.mindrot.jbcrypt.BCrypt;
 import service.servicehelpers.LoginRequest;
 
 
@@ -33,11 +34,7 @@ public class UserService {
 
         UserData user = dataAccess.getUser(request.username());
 
-        if(user == null){
-            throw new DataAccessException("Error: unauthorized");
-        }
-
-        if(user.password() == null || !user.password().equals(request.password())){
+        if(user == null || !BCrypt.checkpw(request.password(), user.password())){
             throw new DataAccessException("Error: unauthorized");
         }
 

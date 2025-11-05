@@ -3,6 +3,7 @@ package service;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.MemDataAcess;
+import dataaccess.SQLDataAccess;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -17,7 +18,7 @@ public class ClearServiceTest {
 
     @BeforeEach
     public void setUp() throws DataAccessException {
-        dataAccess = new MemDataAcess();
+        dataAccess = new SQLDataAccess();
         clearService = new ClearService(dataAccess);
     }
 

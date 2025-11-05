@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.MemDataAcess;
+import dataaccess.SQLDataAccess;
 import io.javalin.*;
 import io.javalin.http.Context;
 import model.AuthData;
@@ -27,19 +28,27 @@ public class Server {
 
     private final Gson gson = new Gson();
 
-    private final UserService userService;
-    private final GameService gameService;
-    private final ClearService clearService;
+    private  UserService userService;
+    private  GameService gameService;
+    private  ClearService clearService;
 
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
-        DataAccess dataAccess = new MemDataAcess();
-        this.userService = new UserService(dataAccess);
-        this.gameService = new GameService(dataAccess);
-        this.clearService = new ClearService(dataAccess);
+        try {
+            DataAccess dataAccess = new SQLDataAccess();
+            this.userService = new UserService(dataAccess);
+            this.gameService = new GameService(dataAccess);
+            this.clearService = new ClearService(dataAccess);
 
-        // Register your endpoints and exception handlers here.
+        } catch (DataAccessException e) {
+            System.err.println("FATAL: Failed to initialize database connection.");
+            System.err.println(e.getMessage());
+            this.userService = null;
+            this.gameService = null;
+            this.clearService = null;
+        }
+
         javalin.delete("/db", this::clearHandler);
         javalin.post("/user", this::registerHandler);
         javalin.post("/session", this::loginHandler);
@@ -48,7 +57,6 @@ public class Server {
         javalin.post("/game", this::createGameHandler);
         javalin.put("/game", this::joinGameHandler);
 
-        // exception handlers
         javalin.exception(DataAccessException.class, this::handleDataAccessException);
         javalin.exception(Exception.class, this::handleGenericException);
     }
@@ -75,6 +83,9 @@ public class Server {
         } else if("Error: already taken".equals(errorMessage)) {
             ctx.status(403);
             ctx.result(gson.toJson(Map.of("message", errorMessage)));
+        } else {
+            ctx.status(500);
+            ctx.result(gson.toJson(Map.of("message", String.format("Error: %s", errorMessage))));
         }
     }
 
