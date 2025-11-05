@@ -66,7 +66,7 @@ public class MemDataAcess implements DataAccess {
     @Override
     public void updateGame(int gameID, GameData gameData) throws DataAccessException {
         if (!games.containsKey(gameID)) {
-            throw new  DataAccessException("Game doesn't exist");
+            throw new DataAccessException("Game doesn't exist");
         } else {
             games.put(gameID, gameData);
         }
