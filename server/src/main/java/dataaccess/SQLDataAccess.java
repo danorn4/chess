@@ -1,6 +1,5 @@
 package dataaccess;
 
-import chess.ChessBoard;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import model.AuthData;
@@ -8,22 +7,20 @@ import model.GameData;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
-import javax.xml.crypto.Data;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
 public class SQLDataAccess implements DataAccess {
     private final Gson gson = new Gson();
 
-    public SQLDataAccess() throws DataAccessException, SQLException {
+    public SQLDataAccess() throws DataAccessException {
         configureDatabase();
     }
 
-    private void configureDatabase() throws DataAccessException, SQLException {
+    private void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
 
         final String createUserTable = """
@@ -53,7 +50,7 @@ public class SQLDataAccess implements DataAccess {
                 statement.executeUpdate(createGameTable);
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Failed to clear database: " + e.getMessage());
+            throw new DataAccessException("Failed to configure database: " + e.getMessage());
         }
     }
 
@@ -142,7 +139,7 @@ public class SQLDataAccess implements DataAccess {
         } catch (SQLException e) {
             throw new DataAccessException("Error: " + e.getMessage());
         }
-        return null;
+        throw new DataAccessException("Failed to create game and retrieve ID");
     }
 
     @Override
