@@ -8,11 +8,13 @@ import model.GameData;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
+import javax.xml.crypto.Data;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 public class SQLDataAccess implements DataAccess {
     private final Gson gson = new Gson();
@@ -32,8 +34,8 @@ public class SQLDataAccess implements DataAccess {
                 )""";
         final String createAuthTable = """
                 CREATE TABLE IF NOT EXISTS auth (
-                    authToken VARCHAR(255) NOT NULL PRIMARY KEY,
-                    username VARCHAR(255) NOT NULL
+                    username VARCHAR(255) NOT NULL,
+                    authToken VARCHAR(255) NOT NULL PRIMARY KEY
                 )""";
         final String createGameTable = """
                 CREATE TABLE IF NOT EXISTS game (
@@ -89,7 +91,7 @@ public class SQLDataAccess implements DataAccess {
                 st.executeUpdate();
             }
         } catch (SQLException e) {
-            if(e.getErrorCode() == 1602) {
+            if(e.getErrorCode() == 1062) {
                 throw new DataAccessException("Username already exists");
             }
             throw new DataAccessException("Error: " + e.getMessage());
@@ -213,7 +215,7 @@ public class SQLDataAccess implements DataAccess {
                 int rowsAffected = st.executeUpdate();
 
                 if (rowsAffected == 0) {
-                    throw new DataAccessException("Error: Game doesn't exist");
+                    throw new DataAccessException("Game doesn't exist");
                 }
             }
         } catch (SQLException e) {
@@ -223,16 +225,59 @@ public class SQLDataAccess implements DataAccess {
 
     @Override
     public AuthData createAuth(String username) throws DataAccessException {
-        return null;
+        var sqlSt = "INSERT INTO auth (username, authToken) VALUES (?, ?);";
+
+        try(var conn = DatabaseManager.getConnection()) {
+            try (var st = conn.prepareStatement(sqlSt)) {
+                String auth = UUID.randomUUID().toString();
+
+                st.setString(1, username);
+                st.setString(2, auth);
+                st.executeUpdate();
+
+                return new AuthData(username, auth);
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: " + e.getMessage(), e);
+        }
     }
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
+        var sqlSt =  "SELECT * FROM auth WHERE authToken = ?;";
+
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var st = conn.prepareStatement(sqlSt)) {
+                st.setString(1, authToken);
+                try (var rs = st.executeQuery()) {
+                    if(rs.next()) {
+                        String usernameFound = rs.getString("username");
+                        String authTokenFound = rs.getString("authToken");
+                        return new AuthData(usernameFound, authTokenFound);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: " + e.getMessage(), e);
+        }
         return null;
     }
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
+        var sqlSt = "DELETE FROM auth WHERE authToken = ?";
 
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var st = conn.prepareStatement(sqlSt)) {
+                st.setString(1, authToken);
+
+                int rowsAffected = st.executeUpdate();
+                if (rowsAffected == 0) {
+                    throw new DataAccessException("Auth doesn't exist");
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to delete auth: " + e.getMessage(), e);
+        }
     }
 }
