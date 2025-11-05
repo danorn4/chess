@@ -75,7 +75,7 @@ public class SQLDataAccess implements DataAccess {
 
     @Override
     public void createUser(UserData user) throws DataAccessException {
-        String hashedPassword = BCrypt.hashpw(user.password(),  BCrypt.gensalt()); // You create the hash
+        String hashedPassword = BCrypt.hashpw(user.password(),  BCrypt.gensalt());
 
         var sqlSt = "INSERT INTO user (username, password, email) VALUES (?, ?, ?);";
 

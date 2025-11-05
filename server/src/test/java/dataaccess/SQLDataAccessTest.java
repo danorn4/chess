@@ -24,7 +24,7 @@ public class SQLDataAccessTest { // Renamed file
     }
 
     @Test
-    public void clear_Success() throws DataAccessException {
+    public void clearSuccess() throws DataAccessException {
         dataAccess.createUser(new UserData("user1", "pass1", "email1"));
         AuthData auth = dataAccess.createAuth("user1"); // <-- Store the auth data
         dataAccess.createGame("game1");
@@ -37,7 +37,7 @@ public class SQLDataAccessTest { // Renamed file
     }
 
     @Test
-    public void createUser_Success() throws DataAccessException {
+    public void createUserSuccess() throws DataAccessException {
         UserData user = new UserData("user1", "password1", "user1@gmail.com");
         dataAccess.createUser(user);
 
@@ -50,7 +50,7 @@ public class SQLDataAccessTest { // Renamed file
     }
 
     @Test
-    public void createUser_Failure_Duplicate() throws DataAccessException {
+    public void createUserFailureDuplicate() throws DataAccessException {
         UserData user1 = new UserData("user1", "password1", "user1@gmail.com");
         dataAccess.createUser(user1);
 
@@ -63,7 +63,7 @@ public class SQLDataAccessTest { // Renamed file
     }
 
     @Test
-    public void getUser_Success() throws DataAccessException {
+    public void getUserSuccess() throws DataAccessException {
         dataAccess.createUser(new UserData("user1", "pass", "email"));
         UserData userFound = dataAccess.getUser("user1");
         assertNotNull(userFound);
@@ -71,13 +71,13 @@ public class SQLDataAccessTest { // Renamed file
     }
 
     @Test
-    public void getUser_Failure_NotFound() throws DataAccessException {
+    public void getUserFailure_NotFound() throws DataAccessException {
         UserData userFound = dataAccess.getUser("nonexistent");
         assertNull(userFound, "getUser should return null for a user that doesn't exist");
     }
 
     @Test
-    public void createGame_Success() throws DataAccessException {
+    public void createGameSuccess() throws DataAccessException {
         GameData game = dataAccess.createGame("Test Game");
         assertNotNull(game, "createGame should return a GameData object");
         assertTrue(game.gameID() > 0, "Game ID should be positive");
@@ -89,14 +89,14 @@ public class SQLDataAccessTest { // Renamed file
     }
 
     @Test
-    public void createGame_Failure_NullName() throws DataAccessException {
+    public void createGameFailureNullName() throws DataAccessException {
         assertThrows(DataAccessException.class, () -> {
             dataAccess.createGame(null);
         }, "Should throw an exception when gameName is null");
     }
 
     @Test
-    public void getGame_Success() throws DataAccessException {
+    public void getGameSuccess() throws DataAccessException {
         GameData game = dataAccess.createGame("My Game");
         GameData gameFound = dataAccess.getGame(game.gameID());
 
@@ -106,7 +106,7 @@ public class SQLDataAccessTest { // Renamed file
     }
 
     @Test
-    public void getGame_Failure_NotFound() throws DataAccessException {
+    public void getGameFailureNotFound() throws DataAccessException {
         DataAccessException e = assertThrows(DataAccessException.class, () -> {
             dataAccess.getGame(9999); // 9999 is a non-existent ID
         });
@@ -114,7 +114,7 @@ public class SQLDataAccessTest { // Renamed file
     }
 
     @Test
-    public void listGames_Success_MultipleGames() throws DataAccessException {
+    public void listGamesSuccessMultipleGames() throws DataAccessException {
         dataAccess.createGame("Game 1");
         dataAccess.createGame("Game 2");
 
@@ -124,14 +124,14 @@ public class SQLDataAccessTest { // Renamed file
     }
 
     @Test
-    public void listGames_Success_Empty() throws DataAccessException {
+    public void listGamesSuccessEmpty() throws DataAccessException {
         Collection<GameData> games = dataAccess.listGames();
         assertNotNull(games);
         assertEquals(0, games.size(), "Should return an empty collection, not null");
     }
 
     @Test
-    public void updateGame_Success() throws DataAccessException {
+    public void updateGameSuccess() throws DataAccessException {
         GameData originalGame = dataAccess.createGame("Original Name");
         int gameID = originalGame.gameID();
 
@@ -152,7 +152,7 @@ public class SQLDataAccessTest { // Renamed file
     }
 
     @Test
-    public void updateGame_Failure_NotFound() throws DataAccessException {
+    public void updateGameFailureNotFound() throws DataAccessException {
         GameData fakeGame = new GameData(9999, "w", "b", "fake", null);
         DataAccessException e = assertThrows(DataAccessException.class, () -> {
             dataAccess.updateGame(9999, fakeGame);
@@ -161,7 +161,7 @@ public class SQLDataAccessTest { // Renamed file
     }
 
     @Test
-    public void createAuth_Success() throws DataAccessException {
+    public void createAuthSuccess() throws DataAccessException {
         AuthData auth = dataAccess.createAuth("myUser");
         assertNotNull(auth);
         assertNotNull(auth.authToken());
@@ -169,14 +169,14 @@ public class SQLDataAccessTest { // Renamed file
     }
 
     @Test
-    public void createAuth_Failure_NullUser() throws DataAccessException {
+    public void createAuthFailureNullUser() throws DataAccessException {
         assertThrows(DataAccessException.class, () -> {
             dataAccess.createAuth(null);
         });
     }
 
     @Test
-    public void getAuth_Success() throws DataAccessException {
+    public void getAuthSuccess() throws DataAccessException {
         AuthData auth = dataAccess.createAuth("myUser");
         AuthData authFound = dataAccess.getAuth(auth.authToken());
 
@@ -185,14 +185,14 @@ public class SQLDataAccessTest { // Renamed file
     }
 
     @Test
-    public void getAuth_Failure_NotFound() throws DataAccessException {
+    public void getAuthFailureNotFound() throws DataAccessException {
         // getAuth (per your MemDataAccess) returns null
         AuthData authFound = dataAccess.getAuth("fake-token");
         assertNull(authFound);
     }
 
     @Test
-    public void deleteAuth_Success() throws DataAccessException {
+    public void deleteAuthSuccess() throws DataAccessException {
         AuthData auth = dataAccess.createAuth("myUser");
         assertNotNull(dataAccess.getAuth(auth.authToken()));
 
