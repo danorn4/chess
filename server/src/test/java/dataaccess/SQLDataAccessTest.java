@@ -71,7 +71,7 @@ public class SQLDataAccessTest { // Renamed file
     }
 
     @Test
-    public void getUserFailure_NotFound() throws DataAccessException {
+    public void getUserFailureNotFound() throws DataAccessException {
         UserData userFound = dataAccess.getUser("nonexistent");
         assertNull(userFound, "getUser should return null for a user that doesn't exist");
     }
@@ -202,7 +202,7 @@ public class SQLDataAccessTest { // Renamed file
     }
 
     @Test
-    public void deleteAuth_Failure_NotFound() throws DataAccessException {
+    public void deleteAuthFailureNotFound() throws DataAccessException {
         DataAccessException e = assertThrows(DataAccessException.class, () -> {
             dataAccess.deleteAuth("fake-token");
         });
