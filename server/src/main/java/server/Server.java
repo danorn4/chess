@@ -83,6 +83,9 @@ public class Server {
         } else if("Error: already taken".equals(errorMessage)) {
             ctx.status(403);
             ctx.result(gson.toJson(Map.of("message", errorMessage)));
+        } else {
+            ctx.status(500);
+            ctx.result(gson.toJson(Map.of("message", String.format("Error: %s", errorMessage))));
         }
     }
 
