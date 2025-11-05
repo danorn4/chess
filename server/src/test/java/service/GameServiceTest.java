@@ -4,6 +4,7 @@ import chess.ChessGame;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.MemDataAcess;
+import dataaccess.SQLDataAccess;
 import model.AuthData;
 import model.GameData;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,9 +21,11 @@ public class GameServiceTest {
     private GameService gameService;
 
     @BeforeEach
-    void setUp() {
-        dataAccess = new MemDataAcess();
+    void setUp() throws DataAccessException {
+        dataAccess = new SQLDataAccess();
         gameService = new GameService(dataAccess);
+
+        dataAccess.clear();
     }
 
     @Test
