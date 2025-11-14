@@ -31,7 +31,7 @@ public class Repl {
             System.out.println(result);
 
             // QUIT
-            if(input.equals("quit")) {
+            if(result.equals("quit")) {
                 break;
             }
         }
