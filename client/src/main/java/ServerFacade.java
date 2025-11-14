@@ -55,35 +55,60 @@ public class ServerFacade {
         // 2. Path: '/session'
         // 3. Request Body: the 'user' object
         // 4. AuthToken: String authToken
-        // 5. Response Class: void
-        makeRequest("DELETE", path, null, authToken, Void.class);
+        // 5. Response Class: null
+        makeRequest("DELETE", path, null, authToken, null);
     }
 
     public GameResult createGame(String authToken, String gameName) throws ResponseException {
         var path = "/game";
+        CreateGameRequest createGameRequest = new CreateGameRequest(gameName);
 
-        CreateGameRequest createGameRequest = new CreateGameRequest(authToken, gameName);
-
+        // Call makeRequest
+        // 1. Method: 'POST'
+        // 2. Path: '/game'
+        // 3. Request Body: the 'createGameRequest' object
+        // 4. AuthToken: String authToken
+        // 5. Response Class: GameResult class
         return makeRequest("POST", path, createGameRequest, authToken, GameResult.class);
     }
 
     public Collection<GameData> listGames(String authToken) throws ResponseException {
         var path = "/game";
+
+        // Call makeRequest
+        // 1. Method: 'GET'
+        // 2. Path: '/game'
+        // 3. Request Body: null
+        // 4. AuthToken: String authToken
+        // 5. Response Class: Collection<GameData>
         return makeRequest("GET", path, null, authToken, Collection.class);
     }
 
-    public void joinGame(String authToken, JoinGameRequest request) {
+    public void joinGame(String authToken, JoinGameRequest request) throws ResponseException{
         var path = "/game";
 
-        return makeRequest("PUT", path, request, authToken, null);
+        // Call makeRequest
+        // 1. Method: 'PUT'
+        // 2. Path: '/game'
+        // 3. Request Body: JoinGameRequest object
+        // 4. AuthToken: String authToken
+        // 5. Response Class: null
+        makeRequest("PUT", path, request, authToken, null);
     }
 
     public void clear() throws ResponseException {
         var path = "/db";
+
+        // Call makeRequest
+        // 1. Method: 'DELETE'
+        // 2. Path: '/db'
+        // 3. Request Body: null
+        // 4. AuthToken: null
+        // 5. Response Class: null
         makeRequest("DELETE", path, null, null, null);
     }
 
-    private <T> T makeRequest(String method, String path, Object request, String authToken, Class<T> responseClass) throws ResponseException {
+    private <T> T makeRequest(String method, String path, Object request, String authToken, Type responseType) throws ResponseException {
         try {
             URI uri = new URI(serverUrl + path);
             URL url = uri.toURL();
@@ -103,7 +128,7 @@ public class ServerFacade {
 
             throwIfNotSuccessful(http);
 
-            return readBody(http, responseClass);
+            return readBody(http, responseType);
         } catch (Exception e) {
             throw new ResponseException(500, e.getMessage());
         }
@@ -130,18 +155,13 @@ public class ServerFacade {
         }
     }
 
-    private static <T> T readBody(HttpURLConnection http, Class<T> responseClass) throws IOException {
+    private static <T> T readBody(HttpURLConnection http, Type responseType) throws IOException {
         T response = null;
         if (http.getContentLength() > 0) {
             try (InputStream respBody = http.getInputStream()) {
                 InputStreamReader reader = new InputStreamReader(respBody);
-                if (responseClass != null) {
-                    if(responseClass.equals(Collection.class)) {
-                        Type collectionType = new TypeToken<Collection<GameData>>(){}.getType();
-                        response = new Gson().fromJson(reader, collectionType);
-                    } else {
-                        response = new Gson().fromJson(reader, responseClass);
-                    }
+                if (responseType != null) {
+                    response =  new Gson().fromJson(reader, responseType);
                 }
             }
         }
