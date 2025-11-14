@@ -1,14 +1,22 @@
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import exception.ResponseException;
+import model.AuthData;
+import model.GameData;
+import model.UserData;
+import service.servicehelpers.CreateGameRequest;
+import service.servicehelpers.GameResult;
+import service.servicehelpers.JoinGameRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.lang.module.ResolutionException;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.Collection;
 
 public class ServerFacade {
 
@@ -18,20 +26,64 @@ public class ServerFacade {
         this.serverUrl = url;
     }
 
+    public AuthData register(UserData user) throws ResponseException {
+        var path = "/user";
+        // Call makeRequest
+        // 1. Method: 'POST'
+        // 2. Path: '/user'
+        // 3. Request Body: the 'user' object
+        // 4. AuthToken: null
+        // 5. Response Class: AuthData class
+        return makeRequest("POST", path, user, null, AuthData.class);
+    }
 
+    public AuthData login(UserData user) throws ResponseException {
+        var path = "/session";
+        // Call makeRequest
+        // 1. Method: 'POST'
+        // 2. Path: '/user'
+        // 3. Request Body: the 'user' object
+        // 4. AuthToken: null
+        // 5. Response Class: AuthData class
+        return makeRequest("POST", path, user, null, AuthData.class);
+    }
 
+    public void logout(String authToken) throws ResponseException {
+        var path = "/session";
+        // Call makeRequest
+        // 1. Method: 'DELETE'
+        // 2. Path: '/session'
+        // 3. Request Body: the 'user' object
+        // 4. AuthToken: String authToken
+        // 5. Response Class: void
+        makeRequest("DELETE", path, null, authToken, Void.class);
+    }
 
+    public GameResult createGame(String authToken, String gameName) throws ResponseException {
+        var path = "/game";
 
+        CreateGameRequest createGameRequest = new CreateGameRequest(authToken, gameName);
 
+        return makeRequest("POST", path, createGameRequest, authToken, GameResult.class);
+    }
 
+    public Collection<GameData> listGames(String authToken) throws ResponseException {
+        var path = "/game";
+        return makeRequest("GET", path, null, authToken, Collection.class);
+    }
 
+    public void joinGame(String authToken, JoinGameRequest request) {
+        var path = "/game";
 
+        return makeRequest("PUT", path, request, authToken, null);
+    }
 
+    public void clear() throws ResponseException {
+        var path = "/db";
+        makeRequest("DELETE", path, null, null, null);
+    }
 
-
-
-
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
+    private <T> T makeRequest(String method, String path, Object request, String authToken, Class<T> responseClass) throws ResponseException {
         try {
             URI uri = new URI(serverUrl + path);
             URL url = uri.toURL();
@@ -40,6 +92,10 @@ public class ServerFacade {
 
             http.setRequestMethod(method);
             http.setDoOutput(true);
+
+            if(authToken != null) {
+                http.setRequestProperty("Authorization", authToken);
+            }
 
             writeBody(request, http);
 
@@ -80,7 +136,12 @@ public class ServerFacade {
             try (InputStream respBody = http.getInputStream()) {
                 InputStreamReader reader = new InputStreamReader(respBody);
                 if (responseClass != null) {
-                    response = new Gson().fromJson(reader, responseClass);
+                    if(responseClass.equals(Collection.class)) {
+                        Type collectionType = new TypeToken<Collection<GameData>>(){}.getType();
+                        response = new Gson().fromJson(reader, collectionType);
+                    } else {
+                        response = new Gson().fromJson(reader, responseClass);
+                    }
                 }
             }
         }
