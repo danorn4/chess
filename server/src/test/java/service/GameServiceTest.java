@@ -132,6 +132,7 @@ public class GameServiceTest {
         DataAccessException e;
 
         JoinGameRequest requestNullColor = new JoinGameRequest(null, game.gameID());
+
         e = assertThrows(DataAccessException.class, () -> {
             gameService.joinGame(auth1.authToken(), requestNullColor);
         });

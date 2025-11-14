@@ -72,6 +72,7 @@ public class Server {
     private void handleDataAccessException(DataAccessException e, Context ctx) {
         String errorMessage = e.getMessage();
 
+        // 400 - Bad Request
         switch (errorMessage) {
             case "Error: bad request", "Error: Game doesn't exist", "Game doesn't exist" -> ctx.status(400);
             case "Error: unauthorized", "Auth doesn't exist" -> ctx.status(401);

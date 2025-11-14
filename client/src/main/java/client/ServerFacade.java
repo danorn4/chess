@@ -8,6 +8,7 @@ import model.UserData;
 import service.servicehelpers.CreateGameRequest;
 import service.servicehelpers.GameResult;
 import service.servicehelpers.JoinGameRequest;
+import service.servicehelpers.ListGamesResult;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -82,7 +83,9 @@ public class ServerFacade {
         // 3. Request Body: null
         // 4. AuthToken: String authToken
         // 5. Response Class: Collection<GameData>
-        return makeRequest("GET", path, null, authToken, Collection.class);
+        ListGamesResult result = makeRequest("GET", path, null, authToken, ListGamesResult.class);
+
+        return result.games();
     }
 
     public void joinGame(String authToken, JoinGameRequest request) throws ResponseException{
@@ -162,7 +165,8 @@ public class ServerFacade {
             try (InputStream respBody = http.getInputStream()) {
                 InputStreamReader reader = new InputStreamReader(respBody);
                 if (responseType != null) {
-                    response =  new Gson().fromJson(reader, responseType);
+                    // This simple line now works for everything
+                    response = new Gson().fromJson(reader, responseType);
                 }
             }
         }
