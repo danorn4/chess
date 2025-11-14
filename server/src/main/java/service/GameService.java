@@ -2,7 +2,8 @@ package service;
 
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
-import model.*;
+import model.AuthData;
+import model.GameData;
 import service.servicehelpers.GameResult;
 import service.servicehelpers.JoinGameRequest;
 

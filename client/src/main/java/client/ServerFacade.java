@@ -1,5 +1,6 @@
+package client;
+
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
