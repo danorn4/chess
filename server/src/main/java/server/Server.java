@@ -72,20 +72,13 @@ public class Server {
     private void handleDataAccessException(DataAccessException e, Context ctx) {
         String errorMessage = e.getMessage();
 
-        if("Error: bad request".equals(errorMessage) ||
-        "Error: Game doesn't exist".equals(errorMessage)) {
-            ctx.status(400);
-            ctx.result(gson.toJson(Map.of("message", errorMessage)));
-        } else if("Error: unauthorized".equals(errorMessage)) {
-            ctx.status(401);
-            ctx.result(gson.toJson(Map.of("message", errorMessage)));
-        } else if("Error: already taken".equals(errorMessage)) {
-            ctx.status(403);
-            ctx.result(gson.toJson(Map.of("message", errorMessage)));
-        } else {
-            ctx.status(500);
-            ctx.result(gson.toJson(Map.of("message", String.format("Error: %s", errorMessage))));
+        switch (errorMessage) {
+            case "Error: bad request", "Error: Game doesn't exist", "Game doesn't exist" -> ctx.status(400);
+            case "Error: unauthorized", "Auth doesn't exist" -> ctx.status(401);
+            case "Error: already taken", "Username already exists" -> ctx.status(403);
+            case null, default -> ctx.status(500);
         }
+        ctx.result(gson.toJson(Map.of("message", String.format("Error: %s", errorMessage))));
     }
 
     private void handleGenericException(Exception e, Context ctx) {
