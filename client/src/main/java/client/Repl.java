@@ -1,5 +1,9 @@
 package client;
 
+import exception.ResponseException;
+import model.AuthData;
+import model.UserData;
+
 import java.util.Scanner;
 
 public class Repl {
@@ -46,14 +50,62 @@ public class Repl {
             return switch (command) {
                 case "help" -> help();
                 case "quit" -> "quit";
-                case "login" -> "implement login function";
-                case "register" -> "implement register function";
+                case "login" -> loginHandler(args);
+                case "register" -> registerHandler(args);
                 default -> "Unknown command. Type 'help' for a list of available commands.";
             };
         } catch (Exception e) {
             return "Error: " + e.getMessage();
         }
     }
+
+    public String registerHandler(String[] args) throws ResponseException {
+        if(args.length != 4) {
+            return "Error: invalid command. Use: register <USERNAME> <PASSWORD> <EMAIL>";
+        }
+
+        String username = args[1];
+        String password = args[2];
+        String email = args[3];
+
+        UserData userData = new UserData(username, password, email);
+        AuthData authData = server.register(userData);
+
+        isLoggedIn = true;
+        authToken = authData.authToken();
+
+        return "Logged in as " + username;
+    }
+
+    public String loginHandler(String[] args) throws ResponseException {
+        if(args.length != 3) {
+            return "Error: invalid command. Use:  login <USERNAME> <PASSWORD>";
+        }
+
+        String username = args[1];
+        String password = args[2];
+
+        UserData userData = new UserData(username, password, null);
+        AuthData authData = server.login(userData);
+
+        isLoggedIn = true;
+        authToken = authData.authToken();
+
+        return "Logged in as " + username;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public String help() {
         if(!isLoggedIn) {
