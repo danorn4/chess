@@ -116,9 +116,7 @@ public class ServerFacade {
         try {
             URI uri = new URI(serverUrl + path);
             URL url = uri.toURL();
-
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
-
             http.setRequestMethod(method);
             http.setDoOutput(true);
 
@@ -127,12 +125,13 @@ public class ServerFacade {
             }
 
             writeBody(request, http);
-
             http.connect();
-
             throwIfNotSuccessful(http);
 
             return readBody(http, responseType);
+
+        } catch (ResponseException e) {
+            throw e;
         } catch (Exception e) {
             throw new ResponseException(500, e.getMessage());
         }
@@ -150,6 +149,7 @@ public class ServerFacade {
 
     private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, ResponseException {
         var status = http.getResponseCode();
+        System.out.print(status);
 
         if (status / 100 != 2) {
             try (InputStream errorStream = http.getErrorStream()) {
