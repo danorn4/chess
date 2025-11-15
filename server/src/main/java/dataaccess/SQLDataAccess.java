@@ -88,7 +88,7 @@ public class SQLDataAccess implements DataAccess {
             }
         } catch (SQLException e) {
             if(e.getErrorCode() == 1062) {
-                throw new DataAccessException("Username already exists");
+                throw new DataAccessException("Error: Username already exists");
             }
             throw new DataAccessException("Error: " + e.getMessage());
         }
@@ -211,7 +211,7 @@ public class SQLDataAccess implements DataAccess {
                 int rowsAffected = st.executeUpdate();
 
                 if (rowsAffected == 0) {
-                    throw new DataAccessException("Game doesn't exist");
+                    throw new DataAccessException("Error: Game doesn't exist");
                 }
             }
         } catch (SQLException e) {
@@ -269,7 +269,7 @@ public class SQLDataAccess implements DataAccess {
 
                 int rowsAffected = st.executeUpdate();
                 if (rowsAffected == 0) {
-                    throw new DataAccessException("Auth doesn't exist");
+                    throw new DataAccessException("Error: Auth doesn't exist");
                 }
             }
         } catch (SQLException e) {

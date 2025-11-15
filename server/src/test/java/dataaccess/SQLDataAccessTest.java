@@ -17,22 +17,20 @@ public class SQLDataAccessTest { // Renamed file
 
     @BeforeEach
     public void setUp() throws Exception {
-        // We use the real SQL Data Access, not the in-memory one
         dataAccess = new SQLDataAccess();
-        // Clear the database before each test
         dataAccess.clear();
     }
 
     @Test
     public void clearSuccess() throws DataAccessException {
         dataAccess.createUser(new UserData("user1", "pass1", "email1"));
-        AuthData auth = dataAccess.createAuth("user1"); // <-- Store the auth data
+        AuthData auth = dataAccess.createAuth("user1");
         dataAccess.createGame("game1");
 
         dataAccess.clear();
 
         assertNull(dataAccess.getUser("user1"), "User data was not cleared");
-        assertNull(dataAccess.getAuth(auth.authToken()), "Auth data was not cleared"); // <-- Now you can check it
+        assertNull(dataAccess.getAuth(auth.authToken()), "Auth data was not cleared");
         assertTrue(dataAccess.listGames().isEmpty(), "Game data was not cleared");
     }
 
@@ -59,7 +57,7 @@ public class SQLDataAccessTest { // Renamed file
         DataAccessException e = assertThrows(DataAccessException.class, () -> {
             dataAccess.createUser(user2);
         });
-        assertEquals("Username already exists", e.getMessage());
+        assertEquals("Error: Username already exists", e.getMessage());
     }
 
     @Test
@@ -108,7 +106,7 @@ public class SQLDataAccessTest { // Renamed file
     @Test
     public void getGameFailureNotFound() throws DataAccessException {
         DataAccessException e = assertThrows(DataAccessException.class, () -> {
-            dataAccess.getGame(9999); // 9999 is a non-existent ID
+            dataAccess.getGame(9999);
         });
         assertEquals("Error: Game doesn't exist", e.getMessage());
     }
@@ -137,7 +135,7 @@ public class SQLDataAccessTest { // Renamed file
 
         GameData updatedGameData = new GameData(
                 gameID,
-                "white-player", // new white username
+                "white-player",
                 null,
                 "Original Name",
                 originalGame.game()
@@ -157,7 +155,7 @@ public class SQLDataAccessTest { // Renamed file
         DataAccessException e = assertThrows(DataAccessException.class, () -> {
             dataAccess.updateGame(9999, fakeGame);
         });
-        assertEquals("Game doesn't exist", e.getMessage());
+        assertEquals("Error: Game doesn't exist", e.getMessage());
     }
 
     @Test
@@ -206,6 +204,6 @@ public class SQLDataAccessTest { // Renamed file
         DataAccessException e = assertThrows(DataAccessException.class, () -> {
             dataAccess.deleteAuth("fake-token");
         });
-        assertEquals("Auth doesn't exist", e.getMessage());
+        assertEquals("Error: Auth doesn't exist", e.getMessage());
     }
 }

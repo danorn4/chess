@@ -68,7 +68,7 @@ public class Repl {
             return e.getMessage();
         } catch (Exception e) {
             // This catches any other *unexpected* bugs
-            return "Error: " + e.getMessage();
+            return e.getMessage();
         }
     }
 
