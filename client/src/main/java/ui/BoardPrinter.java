@@ -31,14 +31,15 @@ public class BoardPrinter {
         out.print(SET_BG_COLOR_LIGHT_GREY);
 
         String[] headers = isWhitePerspective ?
-                new String[]{"  a  ", "  b  ", "  c  ", "  d  ", "  e  ", "  f  ", "  g  ", "  h  "} :
-                new String[]{"  h  ", "  g  ", "  f  ", "  e  ", "  d  ", "  c  ", "  b  ", "  a  "};
+                new String[]{" a ", " b ", " c ", " d ", " e ", " f ", " g ", " h "} :
+                new String[]{" h ", " g ", " f ", " e ", " d ", " c ", " b ", " a "};
 
-        out.print(EMPTY);
+        out.print("   ");
         for (String header : headers) {
             out.print(header);
         }
-        out.print(EMPTY);
+        out.print("   ");
+
         out.println(RESET_BG_COLOR);
     }
 
