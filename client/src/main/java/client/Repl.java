@@ -171,20 +171,45 @@ public class Repl {
         StringBuilder sb = new StringBuilder();
         int listCount = 1;
 
+        String numColor = EscapeSequences.SET_TEXT_COLOR_WHITE;
+        String nameColor = EscapeSequences.SET_TEXT_BOLD + EscapeSequences.SET_TEXT_COLOR_YELLOW;
+        String infoColor = EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY;
+        String playerColor = EscapeSequences.SET_TEXT_BOLD + EscapeSequences.SET_TEXT_COLOR_WHITE;
+        String reset = EscapeSequences.RESET_TEXT_BOLD_FAINT + EscapeSequences.RESET_TEXT_COLOR;
+
+
         for (GameData gameData : listGames) {
             String gameName = gameData.gameName();
-
             String whiteUsername = gameData.whiteUsername() != null ? gameData.whiteUsername() : "<empty>";
             String blackUsername = gameData.blackUsername() != null ? gameData.blackUsername() : "<empty>";
 
-            String gameInfo = String.format("%d. %s (White: %s, Black: %s)%n",
-                    listCount++, gameName, whiteUsername, blackUsername);
-            sb.append(gameInfo);
+            sb.append(numColor);
+            sb.append(String.format("%d. ", listCount++));
+
+            sb.append(nameColor);
+            sb.append(gameName);
+
+            sb.append(infoColor);
+            sb.append(" (White: ");
+
+            sb.append(playerColor);
+            sb.append(whiteUsername);
+
+            sb.append(infoColor);
+            sb.append(", Black: ");
+
+            sb.append(playerColor);
+            sb.append(blackUsername);
+
+            sb.append(infoColor);
+            sb.append(")");
+
+            sb.append(reset);
+            sb.append("\n");
         }
 
         return sb.toString();
     }
-
 
     public String joinHandler(String[] args) throws ResponseException {
         if(args.length != 3) {
@@ -226,20 +251,6 @@ public class Repl {
 
         return "Successfully observing game " + gameToObserve.gameName();
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     private GameData findGameByList(String listIndex) {
         if(listGames == null || listGames.isEmpty()) {
