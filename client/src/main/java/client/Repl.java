@@ -4,8 +4,10 @@ import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
-import service.servicehelpers.GameResult;
 import service.servicehelpers.JoinGameRequest;
+
+import ui.BoardPrinter;
+import chess.ChessGame;
 
 import ui.EscapeSequences;
 
@@ -14,6 +16,7 @@ import java.util.Scanner;
 
 public class Repl {
     private final ServerFacade server;
+    private final BoardPrinter boardPrinter = new  BoardPrinter();
     private boolean isLoggedIn = false;
     private String authToken = null;
     private Collection<GameData> listGames = null;
@@ -232,7 +235,10 @@ public class Repl {
         JoinGameRequest joinGameRequest = new JoinGameRequest(playerColor, gameToJoin.gameID());
         server.joinGame(authToken, joinGameRequest);
 
-        return "Successfully joined game " + gameToJoin.gameName() + " as " + playerColor;
+        ChessGame.TeamColor perspective = playerColor.equals("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+        boardPrinter.printBoard(gameToJoin.game(), perspective);
+
+        return "";
     }
 
     public String observeHandler(String[] args) throws ResponseException {
@@ -250,7 +256,9 @@ public class Repl {
         JoinGameRequest joinGameRequest = new JoinGameRequest(null, gameToObserve.gameID());
         server.joinGame(authToken, joinGameRequest);
 
-        return "Successfully observing game " + gameToObserve.gameName();
+        boardPrinter.printBoard(gameToObserve.game(), ChessGame.TeamColor.WHITE);
+
+        return "";
     }
 
     private GameData findGameByList(String listIndex) {
