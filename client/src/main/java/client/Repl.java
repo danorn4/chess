@@ -7,6 +7,8 @@ import model.UserData;
 import service.servicehelpers.GameResult;
 import service.servicehelpers.JoinGameRequest;
 
+import ui.EscapeSequences;
+
 import java.util.Collection;
 import java.util.Scanner;
 
@@ -15,6 +17,10 @@ public class Repl {
     private boolean isLoggedIn = false;
     private String authToken = null;
     private Collection<GameData> listGames = null;
+
+    private static final String CMD_COLOR = EscapeSequences.SET_TEXT_BOLD + EscapeSequences.SET_TEXT_COLOR_BLUE;
+    private static final String DESC_COLOR = EscapeSequences.SET_TEXT_ITALIC + EscapeSequences.SET_TEXT_COLOR_MAGENTA;
+    private static final String RESET = EscapeSequences.RESET_TEXT_BOLD_FAINT + EscapeSequences.RESET_TEXT_ITALIC + EscapeSequences.RESET_TEXT_COLOR;
 
     public Repl(String serverUrl) {
         this.server = new ServerFacade(serverUrl);
@@ -261,43 +267,35 @@ public class Repl {
 
     public String help() {
         if(!isLoggedIn) {
-            return """
-                    register <USERNAME> <PASSWORD> <EMAIL> : to create an account
-                    login <USERNAME> <PASSWORD> : to play chess
-                    quit : playing chess
-                    help : with possible commands
-                    """;
+            return String.format(
+                    "%s  register <USERNAME> <PASSWORD> <EMAIL>%s %s: to create an account%n" +
+                            "%s  login <USERNAME> <PASSWORD>%s %s: to play chess%n" +
+                            "%s  quit%s %s: playing chess%n" +
+                            "%s  help%s %s: with possible commands%s",
+                    CMD_COLOR, RESET, DESC_COLOR,
+                    CMD_COLOR, RESET, DESC_COLOR,
+                    CMD_COLOR, RESET, DESC_COLOR,
+                    CMD_COLOR, RESET, DESC_COLOR, RESET
+            );
         } else {
-            return """
-                  create <GAME_NAME> - a game
-                  list - games
-                  join <GAME_ID> [WHITE|BLACK] - a game
-                  observe <GAME_ID> - a game
-                  logout - when you are done
-                  quit - playing chess
-                  help - with possible commands
-            """;
+            return String.format(
+                    "%s  create <GAME_NAME>%s %s: a game%n" +
+                            "%s  list%s %s: games%n" +
+                            "%s  join <GAME_ID> [WHITE|BLACK]%s %s: a game%n" +
+                            "%s  observe <GAME_ID>%s %s: a game%n" +
+                            "%s  logout%s %s: when you are done%n" +
+                            "%s  quit%s %s: playing chess%n" +
+                            "%s  help%s %s: with possible commands%s",
+                    CMD_COLOR, RESET, DESC_COLOR,
+                    CMD_COLOR, RESET, DESC_COLOR,
+                    CMD_COLOR, RESET, DESC_COLOR,
+                    CMD_COLOR, RESET, DESC_COLOR,
+                    CMD_COLOR, RESET, DESC_COLOR,
+                    CMD_COLOR, RESET, DESC_COLOR,
+                    CMD_COLOR, RESET, DESC_COLOR, RESET
+            );
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     private void printPrompt() {
         if(!isLoggedIn) {
