@@ -30,17 +30,15 @@ public class BoardPrinter {
         out.print(SET_TEXT_COLOR_WHITE);
         out.print(SET_BG_COLOR_LIGHT_GREY);
 
-        // --- FIX 1 ---
         String[] headers = isWhitePerspective ?
-                new String[]{"\u2003a\u2003", "\u2003b\u2003", "\u2003c\u2003", "\u2003d\u2003", "\u2003e\u2003", "\u2003f\u2003", "\u2003g\u2003", "\u2003h\u2003"} :
-                new String[]{"\u2003h\u2003", "\u2003g\u2003", "\u2003f\u2003", "\u2003e\u2003", "\u2003d\u2003", "\u2003c\u2003", "\u2003b\u2003", "\u2003a\u2003"};
-
-        // --- FIX 2 ---
-        out.print(EMPTY); // Use wide corner
+                new String[]{"a", "b", "c", "d", "e", "f", "g", "h"} :
+                new String[]{"h", "g", "f", "e", "d", "c", "b", "a"};
+        
+        out.print(EMPTY);
         for (String header : headers) {
-            out.print(header);
+            out.printf("\u2003%s\u2003", header);
         }
-        out.print(EMPTY); // Use wide corner
+        out.print(EMPTY);
 
         out.println(RESET_BG_COLOR);
     }
@@ -50,11 +48,9 @@ public class BoardPrinter {
             out.print(SET_TEXT_COLOR_WHITE);
             out.print(SET_BG_COLOR_LIGHT_GREY);
 
-            // --- FIX 3 ---
-            out.printf("\u2003%d\u2003", row); // Use wide em-space for padding
+            out.printf("\u2003%d\u2003", row);
 
             for (int col = 1; col <= 8; col++) {
-                // ... (your square/piece logic is correct)
                 boolean isLightSquare = (row + col) % 2 != 0;
                 if (isLightSquare) {
                     out.print(SET_BG_COLOR_WHITE);
@@ -62,19 +58,13 @@ public class BoardPrinter {
                     out.print(SET_BG_COLOR_DARK_GREY);
                 }
                 ChessPiece piece = board.getPiece(new ChessPosition(row, col));
-                if(piece != null) {
-                    out.print(getPieceString(piece));
-                } else {
-                    out.print(EMPTY);
-                }
-                // out.print(getPieceString(piece));
+                out.print(getPieceString(piece));
             }
 
             out.print(SET_TEXT_COLOR_WHITE);
             out.print(SET_BG_COLOR_LIGHT_GREY);
 
-            // --- FIX 4 ---
-            out.printf("\u2003%d\u2003", row); // Use wide em-space for padding
+            out.printf("\u2003%d\u2003", row);
 
             out.println(RESET_BG_COLOR);
         }
