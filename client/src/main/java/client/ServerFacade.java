@@ -5,10 +5,10 @@ import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
-import service.servicehelpers.CreateGameRequest;
-import service.servicehelpers.GameResult;
-import service.servicehelpers.JoinGameRequest;
-import service.servicehelpers.ListGamesResult;
+import servicehelpers.CreateGameRequest;
+import servicehelpers.GameResult;
+import servicehelpers.JoinGameRequest;
+import servicehelpers.ListGamesResult;
 
 import java.io.IOException;
 import java.io.InputStream;

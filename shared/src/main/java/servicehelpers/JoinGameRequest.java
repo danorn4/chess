@@ -1,4 +1,4 @@
-package service.servicehelpers;
+package servicehelpers;
 
 public record
 JoinGameRequest(String playerColor, int gameID) {}

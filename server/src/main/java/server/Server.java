@@ -12,10 +12,10 @@ import model.UserData;
 import org.jetbrains.annotations.NotNull;
 import service.ClearService;
 import service.GameService;
-import service.servicehelpers.CreateGameRequest;
-import service.servicehelpers.GameResult;
-import service.servicehelpers.JoinGameRequest;
-import service.servicehelpers.LoginRequest;
+import servicehelpers.CreateGameRequest;
+import servicehelpers.GameResult;
+import servicehelpers.JoinGameRequest;
+import servicehelpers.LoginRequest;
 import service.UserService;
 
 import java.util.Collection;

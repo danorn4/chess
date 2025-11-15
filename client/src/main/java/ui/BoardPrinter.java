@@ -33,7 +33,7 @@ public class BoardPrinter {
         String[] headers = isWhitePerspective ?
                 new String[]{"a", "b", "c", "d", "e", "f", "g", "h"} :
                 new String[]{"h", "g", "f", "e", "d", "c", "b", "a"};
-        
+
         out.print(EMPTY);
         for (String header : headers) {
             out.printf("\u2003%s\u2003", header);

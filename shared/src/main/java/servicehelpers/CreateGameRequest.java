@@ -1,3 +1,3 @@
-package service.servicehelpers;
+package servicehelpers;
 
 public record CreateGameRequest(String gameName) {}

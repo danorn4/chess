@@ -4,7 +4,7 @@ import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
-import service.servicehelpers.JoinGameRequest;
+import servicehelpers.JoinGameRequest;
 
 import ui.BoardPrinter;
 import chess.ChessGame;

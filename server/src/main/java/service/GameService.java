@@ -4,8 +4,8 @@ import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
-import service.servicehelpers.GameResult;
-import service.servicehelpers.JoinGameRequest;
+import servicehelpers.GameResult;
+import servicehelpers.JoinGameRequest;
 
 import java.util.Collection;
 
