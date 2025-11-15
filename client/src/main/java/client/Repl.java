@@ -5,6 +5,7 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 import service.servicehelpers.GameResult;
+import service.servicehelpers.JoinGameRequest;
 
 import java.util.Collection;
 import java.util.Scanner;
@@ -13,7 +14,7 @@ public class Repl {
     private final ServerFacade server;
     private boolean isLoggedIn = false;
     private String authToken = null;
-
+    private Collection<GameData> listGames = null;
 
     public Repl(String serverUrl) {
         this.server = new ServerFacade(serverUrl);
@@ -82,8 +83,9 @@ public class Repl {
             case "logout" -> logoutHandler(args);
             case "create" -> createHandler(args);
             case "list" -> listHandler(args);
-            case "join" -> "implement joinHandler()";
-            case "observe" -> "implement observeHandler()";
+            case "join" -> joinHandler(args);
+            case "observe" -> observeHandler(args);
+            case "quit" -> "quit";
             default -> "Unknown command. Type 'help' for a list of available commands.";
         };
     }
@@ -154,6 +156,7 @@ public class Repl {
         }
 
         Collection<GameData> listGames = server.listGames(authToken);
+        this.listGames = listGames;
 
         if (listGames == null || listGames.isEmpty()) {
             return "No games available.";
@@ -165,29 +168,58 @@ public class Repl {
         for (GameData gameData : listGames) {
             String gameName = gameData.gameName();
 
-            // temp id
-            int gameID = gameData.gameID();
-
             String whiteUsername = gameData.whiteUsername() != null ? gameData.whiteUsername() : "<empty>";
             String blackUsername = gameData.blackUsername() != null ? gameData.blackUsername() : "<empty>";
 
-            String gameInfo = String.format("%d. <<<GameID: %d>>> %s (White: %s, Black: %s)%n",
-                    listCount++, gameID, gameName, whiteUsername, blackUsername);
+            String gameInfo = String.format("%d. %s (White: %s, Black: %s)%n",
+                    listCount++, gameName, whiteUsername, blackUsername);
             sb.append(gameInfo);
         }
 
         return sb.toString();
     }
 
-    /*
+
     public String joinHandler(String[] args) throws ResponseException {
         if(args.length != 3) {
             return "Error: invalid command. Use: join <GAME_ID> [WHITE|BLACK]";
         }
 
-        int gameID = ;
+        String listNumber = args[1];
+        GameData gameToJoin = findGameByList(listNumber);
+
+        if(gameToJoin == null) {
+            return "Error: Invalid game number. Run \"list\" to see list of available games.";
+        }
+
+        String playerColor = args[2].toUpperCase();
+        if(!playerColor.equals("WHITE") && !playerColor.equals("BLACK")) {
+            return "Error: Invalid Color. Must be WHITE or BLACK.";
+        }
+
+        JoinGameRequest joinGameRequest = new JoinGameRequest(playerColor, gameToJoin.gameID());
+        server.joinGame(authToken, joinGameRequest);
+
+        return "Successfully joined game " + gameToJoin.gameName() + " as " + playerColor;
     }
-    */
+
+    public String observeHandler(String[] args) throws ResponseException {
+        if(args.length != 2) {
+            return "Error: invalid command. Use: observe <GAME_ID>";
+        }
+
+        String listNumber = args[1];
+        GameData gameToObserve = findGameByList(listNumber);
+
+        if(gameToObserve == null) {
+            return "Error: Invalid game number. Run \"list\" to see list of available games.";
+        }
+
+        JoinGameRequest joinGameRequest = new JoinGameRequest(null, gameToObserve.gameID());
+        server.joinGame(authToken, joinGameRequest);
+
+        return "Successfully observing game " + gameToObserve.gameName();
+    }
 
 
 
@@ -200,6 +232,32 @@ public class Repl {
 
 
 
+
+
+
+    private GameData findGameByList(String listIndex) {
+        if(listGames == null || listGames.isEmpty()) {
+            return null;
+        }
+
+        try {
+            int listNumber = Integer.parseInt(listIndex);
+
+            if (listNumber < 1 || listNumber > listGames.size()) {
+                return null;
+            }
+            int listCounter = 1;
+            for(GameData gameData : listGames) {
+                if(listCounter == listNumber) {
+                    return gameData;
+                }
+                listCounter++;
+            }
+        } catch (NumberFormatException e) {
+            return null;
+        }
+        return null;
+    }
 
     public String help() {
         if(!isLoggedIn) {
