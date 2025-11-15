@@ -253,8 +253,10 @@ public class Repl {
             return "Error: Invalid game number. Run \"list\" to see list of available games.";
         }
 
+        /*
         JoinGameRequest joinGameRequest = new JoinGameRequest(null, gameToObserve.gameID());
         server.joinGame(authToken, joinGameRequest);
+        */
 
         boardPrinter.printBoard(gameToObserve.game(), ChessGame.TeamColor.WHITE);
 

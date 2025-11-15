@@ -38,19 +38,17 @@ public class BoardPrinter {
         for (String header : headers) {
             out.print(header);
         }
-        out.print(EMPTY); // Other corner space
+        out.print(EMPTY);
         out.println(RESET_BG_COLOR);
     }
 
     private void drawRows(ChessBoard board, int startRow, int increment) {
         for (int row = startRow; row >= 1 && row <= 8; row += increment) {
-            // Print the row number
             out.print(SET_TEXT_COLOR_WHITE);
             out.print(SET_BG_COLOR_LIGHT_GREY);
             out.printf(" %d ", row);
 
             for (int col = 1; col <= 8; col++) {
-                // Alternate background colors
                 boolean isLightSquare = (row + col) % 2 != 0;
                 if (isLightSquare) {
                     out.print(SET_BG_COLOR_WHITE);
@@ -62,12 +60,11 @@ public class BoardPrinter {
                 out.print(getPieceString(piece));
             }
 
-            // Print the row number again on the right
             out.print(SET_TEXT_COLOR_WHITE);
             out.print(SET_BG_COLOR_LIGHT_GREY);
             out.printf(" %d ", row);
 
-            out.println(RESET_BG_COLOR); // End of the row
+            out.println(RESET_BG_COLOR);
         }
     }
 
@@ -84,7 +81,6 @@ public class BoardPrinter {
             case ROOK -> pieceStr = (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? WHITE_ROOK : BLACK_ROOK;
             case PAWN -> pieceStr = (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? WHITE_PAWN : BLACK_PAWN;
         }
-        // Set piece color (Red for Black, Blue for White as per instructions)
         String color = (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? SET_TEXT_COLOR_BLUE : SET_TEXT_COLOR_RED;
         return color + pieceStr;
     }
