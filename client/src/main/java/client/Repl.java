@@ -30,9 +30,9 @@ public class Repl {
         System.out.println("Welcome to 240 chess. Type Help to get started.");
 
         Scanner scanner = new Scanner(System.in);
-        String result = "";
+        String result;
 
-        while(true) {
+        do {
             printPrompt();
 
             // READ
@@ -45,10 +45,7 @@ public class Repl {
             System.out.println(result);
 
             // QUIT
-            if(result.equals("quit")) {
-                break;
-            }
-        }
+        } while (!result.equals("quit"));
         System.out.println("Goodbye!");
     }
 
@@ -66,7 +63,11 @@ public class Repl {
             }
 
 
+        } catch (ResponseException e) {
+            // Just return the clean message from the facade
+            return e.getMessage();
         } catch (Exception e) {
+            // This catches any other *unexpected* bugs
             return "Error: " + e.getMessage();
         }
     }
@@ -151,7 +152,7 @@ public class Repl {
 
         String gameName = args[1];
 
-        GameResult gameResult = server.createGame(authToken, gameName);
+        server.createGame(authToken, gameName);
 
         return "Successfully created game " + gameName;
     }

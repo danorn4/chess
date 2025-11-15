@@ -24,6 +24,8 @@ public class ServerFacade {
 
     private final String serverUrl;
 
+    private record ErrorMessage(String message) {}
+
     public ServerFacade(String url) {
         this.serverUrl = url;
     }
@@ -149,12 +151,26 @@ public class ServerFacade {
 
     private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, ResponseException {
         var status = http.getResponseCode();
-
-        if (status / 100 != 2) {
+        if (status / 100 != 2) { // Check if not a 2xx success code
+            // Read the error body
+            String errorBody;
             try (InputStream errorStream = http.getErrorStream()) {
-                String errorBody = new String(errorStream.readAllBytes());
-                throw new ResponseException(status, "Failure: " + status + " - " + errorBody);
+                errorBody = new String(errorStream.readAllBytes());
             }
+
+            String message;
+            try {
+                // 1. Parse the JSON error body
+                ErrorMessage errorResponse = new Gson().fromJson(errorBody, ErrorMessage.class);
+                // 2. Get the clean message from the JSON
+                message = errorResponse.message();
+            } catch (Exception e) {
+                // If parsing fails, just use the raw body
+                message = errorBody;
+            }
+
+            // 3. Throw an exception with the *clean* message
+            throw new ResponseException(status, message);
         }
     }
 
