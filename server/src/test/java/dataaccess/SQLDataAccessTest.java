@@ -57,7 +57,7 @@ public class SQLDataAccessTest { // Renamed file
         DataAccessException e = assertThrows(DataAccessException.class, () -> {
             dataAccess.createUser(user2);
         });
-        assertEquals("Error: Username already exists", e.getMessage());
+        assertEquals("Username already exists", e.getMessage());
     }
 
     @Test
@@ -108,7 +108,7 @@ public class SQLDataAccessTest { // Renamed file
         DataAccessException e = assertThrows(DataAccessException.class, () -> {
             dataAccess.getGame(9999);
         });
-        assertEquals("Error: Game doesn't exist", e.getMessage());
+        assertEquals("Game doesn't exist", e.getMessage());
     }
 
     @Test
@@ -155,7 +155,7 @@ public class SQLDataAccessTest { // Renamed file
         DataAccessException e = assertThrows(DataAccessException.class, () -> {
             dataAccess.updateGame(9999, fakeGame);
         });
-        assertEquals("Error: Game doesn't exist", e.getMessage());
+        assertEquals("Game doesn't exist", e.getMessage());
     }
 
     @Test
@@ -204,6 +204,6 @@ public class SQLDataAccessTest { // Renamed file
         DataAccessException e = assertThrows(DataAccessException.class, () -> {
             dataAccess.deleteAuth("fake-token");
         });
-        assertEquals("Error: Auth doesn't exist", e.getMessage());
+        assertEquals("Auth doesn't exist", e.getMessage());
     }
 }

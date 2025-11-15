@@ -88,9 +88,9 @@ public class SQLDataAccess implements DataAccess {
             }
         } catch (SQLException e) {
             if(e.getErrorCode() == 1062) {
-                throw new DataAccessException("Error: Username already exists");
+                throw new DataAccessException("Username already exists");
             }
-            throw new DataAccessException("Error: " + e.getMessage());
+            throw new DataAccessException(e.getMessage());
         }
     }
 
@@ -111,7 +111,7 @@ public class SQLDataAccess implements DataAccess {
                 }
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error: " + e.getMessage());
+            throw new DataAccessException(e.getMessage());
         }
         return null;
     }
@@ -136,7 +136,7 @@ public class SQLDataAccess implements DataAccess {
                 }
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error: " + e.getMessage());
+            throw new DataAccessException(e.getMessage());
         }
         throw new DataAccessException("Failed to create game and retrieve ID");
     }
@@ -163,9 +163,9 @@ public class SQLDataAccess implements DataAccess {
                 }
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error: " + e.getMessage());
+            throw new DataAccessException(e.getMessage());
         }
-        throw new DataAccessException("Error: Game doesn't exist");
+        throw new DataAccessException("Game doesn't exist");
     }
 
     @Override
@@ -190,7 +190,7 @@ public class SQLDataAccess implements DataAccess {
                 }
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error: " + e.getMessage());
+            throw new DataAccessException(e.getMessage());
         }
         return gameDataList;
     }
@@ -211,7 +211,7 @@ public class SQLDataAccess implements DataAccess {
                 int rowsAffected = st.executeUpdate();
 
                 if (rowsAffected == 0) {
-                    throw new DataAccessException("Error: Game doesn't exist");
+                    throw new DataAccessException("Game doesn't exist");
                 }
             }
         } catch (SQLException e) {
@@ -234,7 +234,7 @@ public class SQLDataAccess implements DataAccess {
                 return new AuthData(username, auth);
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error: " + e.getMessage());
+            throw new DataAccessException(e.getMessage());
         }
     }
 
@@ -254,7 +254,7 @@ public class SQLDataAccess implements DataAccess {
                 }
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error: " + e.getMessage());
+            throw new DataAccessException(e.getMessage());
         }
         return null;
     }
@@ -269,7 +269,7 @@ public class SQLDataAccess implements DataAccess {
 
                 int rowsAffected = st.executeUpdate();
                 if (rowsAffected == 0) {
-                    throw new DataAccessException("Error: Auth doesn't exist");
+                    throw new DataAccessException("Auth doesn't exist");
                 }
             }
         } catch (SQLException e) {

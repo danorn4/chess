@@ -17,9 +17,9 @@ public class UserService {
 
     public AuthData register(UserData user) throws DataAccessException {
         if(user.username() == null || user.email() == null || user.password() == null) {
-            throw new DataAccessException("Error: bad request");
+            throw new DataAccessException("bad request");
         } if(dataAccess.getUser(user.username()) != null){
-            throw new DataAccessException("Error: already taken");
+            throw new DataAccessException("already taken");
         }
 
         dataAccess.createUser(user);
@@ -29,13 +29,13 @@ public class UserService {
 
     public AuthData login(LoginRequest request) throws DataAccessException {
         if(request.username() == null || request.password() == null){
-            throw new DataAccessException("Error: bad request");
+            throw new DataAccessException("bad request");
         }
 
         UserData user = dataAccess.getUser(request.username());
 
         if(user == null || !BCrypt.checkpw(request.password(), user.password())){
-            throw new DataAccessException("Error: unauthorized");
+            throw new DataAccessException("unauthorized");
         }
 
         return dataAccess.createAuth(user.username());
@@ -43,11 +43,11 @@ public class UserService {
 
     public void logout(String authToken) throws DataAccessException {
         if(authToken == null){
-            throw new DataAccessException("Error: bad request");
+            throw new DataAccessException("bad request");
         }
         AuthData auth = dataAccess.getAuth(authToken);
         if(auth == null){
-            throw new DataAccessException("Error: unauthorized");
+            throw new DataAccessException("unauthorized");
         }
 
         dataAccess.deleteAuth(authToken);

@@ -48,7 +48,7 @@ public class GameServiceTest {
         DataAccessException e = assertThrows(DataAccessException.class, () -> {
             gameService.listGames("fake token");
         });
-        assertEquals("Error: unauthorized",  e.getMessage());
+        assertEquals("unauthorized",  e.getMessage());
     }
 
     @Test
@@ -74,7 +74,7 @@ public class GameServiceTest {
             gameService.createGame("non-existent token", gameName);
         });
 
-        assertEquals("Error: unauthorized", e.getMessage());
+        assertEquals("unauthorized", e.getMessage());
     }
 
     @Test
@@ -86,7 +86,7 @@ public class GameServiceTest {
             gameService.createGame(auth.authToken(), gameName);
         });
 
-        assertEquals("Error: bad request", e.getMessage());
+        assertEquals("bad request", e.getMessage());
     }
 
     @Test
@@ -121,7 +121,7 @@ public class GameServiceTest {
             gameService.joinGame("non-existent token", joinRequest);
         });
 
-        assertEquals("Error: unauthorized", e.getMessage());
+        assertEquals("unauthorized", e.getMessage());
     }
 
     @Test
@@ -136,13 +136,13 @@ public class GameServiceTest {
         e = assertThrows(DataAccessException.class, () -> {
             gameService.joinGame(auth1.authToken(), requestNullColor);
         });
-        assertEquals("Error: bad request", e.getMessage());
+        assertEquals("bad request", e.getMessage());
 
         JoinGameRequest requestWrongColor = new JoinGameRequest("BLUE", game.gameID());
         e = assertThrows(DataAccessException.class, () -> {
             gameService.joinGame(auth1.authToken(), requestWrongColor);
         });
-        assertEquals("Error: bad request", e.getMessage());
+        assertEquals("bad request", e.getMessage());
     }
 
     @Test
@@ -165,7 +165,7 @@ public class GameServiceTest {
             gameService.joinGame(auth1.authToken(), request);
         });
 
-        assertEquals("Error: already taken", e.getMessage());
+        assertEquals("already taken", e.getMessage());
     }
 
     @Test
@@ -178,7 +178,7 @@ public class GameServiceTest {
             gameService.joinGame(auth.authToken(), request);
         });
 
-        assertEquals("Error: Game doesn't exist", e.getMessage());
+        assertEquals("Game doesn't exist", e.getMessage());
     }
 
 

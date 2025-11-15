@@ -20,7 +20,7 @@ public class GameService {
         AuthData auth = dataAccess.getAuth(authToken);
 
         if(auth == null) {
-            throw new DataAccessException("Error: unauthorized");
+            throw new DataAccessException("unauthorized");
         }
         return auth;
     }
@@ -34,7 +34,7 @@ public class GameService {
         authenticate(authToken);
 
         if(gameName == null ||  gameName.isEmpty()) {
-            throw new DataAccessException("Error: bad request");
+            throw new DataAccessException("bad request");
         }
 
         GameData game = dataAccess.createGame(gameName);
@@ -50,11 +50,11 @@ public class GameService {
         GameData game = dataAccess.getGame(request.gameID());
 
         if (playerColor == null) {
-            throw new DataAccessException("Error: bad request");
+            throw new DataAccessException("bad request");
         }
         if (playerColor.equals("WHITE")) {
             if (game.whiteUsername() != null) {
-                throw new DataAccessException("Error: already taken");
+                throw new DataAccessException("already taken");
             }
             GameData updatedGame = new GameData(
                     game.gameID(),
@@ -66,7 +66,7 @@ public class GameService {
             dataAccess.updateGame(updatedGame.gameID(), updatedGame);
         } else if (playerColor.equals("BLACK")) {
             if (game.blackUsername() != null) {
-                throw new DataAccessException("Error: already taken");
+                throw new DataAccessException("already taken");
             }
             GameData updatedGame = new GameData(
                     game.gameID(),
@@ -77,7 +77,7 @@ public class GameService {
             );
             dataAccess.updateGame(updatedGame.gameID(), updatedGame);
         } else {
-            throw new DataAccessException("Error: bad request");
+            throw new DataAccessException("bad request");
         }
     }
 

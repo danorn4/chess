@@ -74,14 +74,14 @@ public class Server {
 
         // 400 - Bad Request
         switch (errorMessage) {
-            case "Error: bad request", "Error: Game doesn't exist" -> ctx.status(400);
-            case "Error: unauthorized", "Error: Auth doesn't exist" -> ctx.status(401);
-            case "Error: already taken", "Error: Username already exists" -> ctx.status(403);
+            case "bad request", "Game doesn't exist" -> ctx.status(400);
+            case "unauthorized", "Auth doesn't exist" -> ctx.status(401);
+            case "already taken", "Username already exists" -> ctx.status(403);
             case null, default -> ctx.status(500);
         }
 
         assert errorMessage != null;
-        ctx.result(gson.toJson(Map.of("message", errorMessage)));
+        ctx.result(gson.toJson(Map.of("message", String.format("Error: %s", errorMessage))));
     }
 
     private void handleGenericException(Exception e, Context ctx) {

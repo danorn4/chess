@@ -47,7 +47,7 @@ public class UserServiceTests {
 
         DataAccessException e = assertThrows(DataAccessException.class, () -> userService.register(newUser));
 
-        assertEquals("Error: already taken",  e.getMessage());
+        assertEquals("already taken",  e.getMessage());
     }
 
     @Test
@@ -73,7 +73,7 @@ public class UserServiceTests {
 
         DataAccessException e = assertThrows(DataAccessException.class, () -> userService.login(loginRequest));
 
-        assertEquals("Error: unauthorized",  e.getMessage());
+        assertEquals("unauthorized",  e.getMessage());
     }
 
     @Test
@@ -85,7 +85,7 @@ public class UserServiceTests {
 
         DataAccessException e = assertThrows(DataAccessException.class, () -> userService.login(loginRequest));
 
-        assertEquals("Error: bad request",  e.getMessage());
+        assertEquals("bad request",  e.getMessage());
     }
 
     @Test
@@ -107,6 +107,6 @@ public class UserServiceTests {
 
         DataAccessException e = assertThrows(DataAccessException.class, () -> userService.logout(fakeToken));
 
-        assertEquals("Error: unauthorized", e.getMessage());
+        assertEquals("unauthorized", e.getMessage());
     }
 }
