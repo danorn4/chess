@@ -24,7 +24,7 @@ public class BoardPrinter {
         }
         out.print(RESET_BG_COLOR);
     }
-
+    
     private void drawHeaders(boolean isWhitePerspective) {
         out.print(RESET_BG_COLOR);
         out.print(SET_TEXT_COLOR_WHITE);
@@ -34,11 +34,11 @@ public class BoardPrinter {
                 new String[]{"a", "b", "c", "d", "e", "f", "g", "h"} :
                 new String[]{"h", "g", "f", "e", "d", "c", "b", "a"};
 
-        out.print(EMPTY);
+        out.print("\u200A"+EMPTY);
         for (String header : headers) {
-            out.printf("\u2003%s\u2003", header);
+            out.print(HEADER_SPACE + header + HEADER_SPACE);
         }
-        out.print(EMPTY);
+        out.print(EMPTY+"\u200A");
 
         out.println(RESET_BG_COLOR);
     }
@@ -64,7 +64,7 @@ public class BoardPrinter {
             out.print(SET_TEXT_COLOR_WHITE);
             out.print(SET_BG_COLOR_LIGHT_GREY);
 
-            out.printf("\u2003%d\u2003", row);
+            out.printf("\u2003%d\u2003\u200A", row);
 
             out.println(RESET_BG_COLOR);
         }
