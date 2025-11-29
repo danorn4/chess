@@ -15,11 +15,11 @@ public class BoardPrinter {
 
         if (perspective == ChessGame.TeamColor.BLACK) {
             drawHeaders(false);
-            drawRows(board, 8, -1);
+            drawRows(board, 1, 1);
             drawHeaders(false);
         } else {
             drawHeaders(true);
-            drawRows(board, 1, 1);
+            drawRows(board, 8, -1);
             drawHeaders(true);
         }
         out.print(RESET_BG_COLOR);
@@ -44,27 +44,38 @@ public class BoardPrinter {
     }
 
     private void drawRows(ChessBoard board, int startRow, int increment) {
+        // Determine column iteration
+        boolean isWhitePerspective = (startRow == 8);
+
         for (int row = startRow; row >= 1 && row <= 8; row += increment) {
             out.print(SET_TEXT_COLOR_WHITE);
             out.print(SET_BG_COLOR_LIGHT_GREY);
-
             out.printf("\u2003%d\u2003", row);
 
-            for (int col = 1; col <= 8; col++) {
+            // --- THIS IS THE FIX ---
+            // If it's White's perspective, print cols 1 -> 8
+            // If it's Black's perspective, print cols 8 -> 1
+            int colStart = isWhitePerspective ? 1 : 8;
+            int colEnd = isWhitePerspective ? 9 : 0;
+            int colIncrement = isWhitePerspective ? 1 : -1;
+            // --- END OF FIX ---
+
+            for (int col = colStart; col != colEnd; col += colIncrement) {
+                // Alternate background colors
                 boolean isLightSquare = (row + col) % 2 != 0;
                 if (isLightSquare) {
                     out.print(SET_BG_COLOR_WHITE);
                 } else {
                     out.print(SET_BG_COLOR_DARK_GREY);
                 }
+
                 ChessPiece piece = board.getPiece(new ChessPosition(row, col));
                 out.print(getPieceString(piece));
             }
 
             out.print(SET_TEXT_COLOR_WHITE);
             out.print(SET_BG_COLOR_LIGHT_GREY);
-
-            out.printf("\u2003%d\u2003\u200A", row);
+            out.printf("\u2003%d\u2003", row);
 
             out.println(RESET_BG_COLOR);
         }

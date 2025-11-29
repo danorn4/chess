@@ -17,5 +17,6 @@
     <orderEntry type="library" exported="" name="slf4j.simple" level="project" />
     <orderEntry type="library" exported="" name="mindrot.jbcrypt" level="project" />
     <orderEntry type="library" exported="" name="mysql.connector.j" level="project" />
+    <orderEntry type="library" exported="" name="glassfish.tyrus.bundles.standalone.client" level="project" />
   </component>
 </module>
