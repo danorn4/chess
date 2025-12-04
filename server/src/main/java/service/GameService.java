@@ -16,7 +16,7 @@ public class GameService {
         this.dataAccess = dataAccess;
     }
 
-    private AuthData authenticate(String authToken) throws DataAccessException {
+    public AuthData authenticate(String authToken) throws DataAccessException {
         AuthData auth = dataAccess.getAuth(authToken);
 
         if(auth == null) {
@@ -49,8 +49,8 @@ public class GameService {
 
         GameData game = dataAccess.getGame(request.gameID());
 
-        if (playerColor == null) {
-            throw new DataAccessException("bad request");
+        if (playerColor == null || playerColor.isEmpty()) {
+            return;
         }
         if (playerColor.equals("WHITE")) {
             if (game.whiteUsername() != null) {
