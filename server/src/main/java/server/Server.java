@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import com.mysql.cj.Session;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.SQLDataAccess;
@@ -10,6 +11,7 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 import org.jetbrains.annotations.NotNull;
+import server.websocket.WebSocketHandler;
 import service.ClearService;
 import service.GameService;
 import servicehelpers.CreateGameRequest;
@@ -24,12 +26,13 @@ import java.util.Map;
 public class Server {
 
     private final Javalin javalin;
+    private WebSocketHandler webSocketHandler;
 
     private final Gson gson = new Gson();
 
-    private  UserService userService;
-    private  GameService gameService;
-    private  ClearService clearService;
+    private UserService userService;
+    private GameService gameService;
+    private ClearService clearService;
 
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
@@ -40,12 +43,15 @@ public class Server {
             this.gameService = new GameService(dataAccess);
             this.clearService = new ClearService(dataAccess);
 
+            this.webSocketHandler = new WebSocketHandler();
+
         } catch (DataAccessException e) {
             System.err.println("FATAL: Failed to initialize database connection.");
             System.err.println(e.getMessage());
             this.userService = null;
             this.gameService = null;
             this.clearService = null;
+            this.webSocketHandler = null;
         }
 
         javalin.delete("/db", this::clearHandler);
@@ -56,6 +62,11 @@ public class Server {
         javalin.post("/game", this::createGameHandler);
         javalin.put("/game", this::joinGameHandler);
 
+        javalin.ws("/ws", ws -> {
+            ws.onMessage(ctx -> {
+                webSocketHandler.onMessage((ctx.session, ctx.message());
+            });
+        });
         javalin.exception(DataAccessException.class, this::handleDataAccessException);
         javalin.exception(Exception.class, this::handleGenericException);
     }
