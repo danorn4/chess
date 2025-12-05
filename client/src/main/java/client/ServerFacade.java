@@ -22,7 +22,7 @@ import java.util.Collection;
 
 public class ServerFacade {
 
-    private final String serverUrl;
+    final String serverUrl;
 
     private record ErrorMessage(String message) {}
 

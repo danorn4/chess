@@ -114,7 +114,7 @@ public class GameService {
     private static ChessGame getChessGame(GameData gameData, String username) throws DataAccessException {
         ChessGame game = gameData.game();
 
-        if (game.getTeamTurn() == null) {
+        if (game.isGameOver()) {
             throw new DataAccessException("Game is over");
         }
 
@@ -162,10 +162,11 @@ public class GameService {
             throw new DataAccessException("Observer cannot resign");
         }
 
-        if (game.getTeamTurn() == null) {
+        if (game.isGameOver()) {
             throw new DataAccessException("Game is already over");
         }
 
+        game.setGameOver(true);
         game.setTeamTurn(null);
 
         GameData updatedGame = new GameData(

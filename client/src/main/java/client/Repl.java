@@ -1,5 +1,8 @@
 package client;
 
+import client.websocket.NotificationHandler;
+import client.websocket.WebSocketFacade;
+import com.google.gson.Gson;
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
@@ -7,19 +10,27 @@ import model.UserData;
 import servicehelpers.JoinGameRequest;
 
 import ui.BoardPrinter;
-import chess.ChessGame;
 
 import ui.EscapeSequences;
+import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.util.Collection;
 import java.util.Scanner;
 
-public class Repl {
+public class Repl implements NotificationHandler {
     private final ServerFacade server;
     private final BoardPrinter boardPrinter = new  BoardPrinter();
     private boolean isLoggedIn = false;
     private String authToken = null;
     private Collection<GameData> listGames = null;
+
+    private final String serverUrl;
+
+    private WebSocketFacade ws;
 
     private static final String CMD_COLOR = EscapeSequences.SET_TEXT_BOLD + EscapeSequences.SET_TEXT_COLOR_BLUE;
     private static final String DESC_COLOR = EscapeSequences.SET_TEXT_ITALIC + EscapeSequences.SET_TEXT_COLOR_MAGENTA;
@@ -27,6 +38,7 @@ public class Repl {
 
     public Repl(String serverUrl) {
         this.server = new ServerFacade(serverUrl);
+        this.serverUrl = serverUrl;
     }
 
     public void run() {
@@ -50,6 +62,29 @@ public class Repl {
             // QUIT
         } while (!result.equals("quit"));
         System.out.println("Goodbye!");
+    }
+
+    private void gameplayLoop() {
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            // Different prompt to let them know they are in a game
+            System.out.print("[GAMEPLAY] >>> ");
+            String line = scanner.nextLine();
+
+            // Call the specific gameplay evaluator
+            String result = gameplayEval(line);
+
+            // Print the result (unless it's empty/silent)
+            if (!result.isEmpty()) {
+                System.out.println(result);
+            }
+
+            // Break the loop if the user leaves (this returns to the Main Menu)
+            if (result.equals("Left the game")) {
+                break;
+            }
+        }
     }
 
     public String eval(String input) {
@@ -235,10 +270,13 @@ public class Repl {
         JoinGameRequest joinGameRequest = new JoinGameRequest(playerColor, gameToJoin.gameID());
         server.joinGame(authToken, joinGameRequest);
 
-        ChessGame.TeamColor perspective = playerColor.equals("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
-        boardPrinter.printBoard(gameToJoin.game(), perspective);
+        this.ws = new WebSocketFacade(this.serverUrl, this);        UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameToJoin.gameID());
+        ws.sendCommand(command);
+        // -----------------------------
 
-        return "";
+        // Removed manual board printing. The server will send LOAD_GAME.
+
+        return ""; // Or return "Joining game..."
     }
 
     public String observeHandler(String[] args) throws ResponseException {
@@ -253,12 +291,14 @@ public class Repl {
             return "Error: Invalid game number. Run \"list\" to see list of available games.";
         }
 
-        /*
-        JoinGameRequest joinGameRequest = new JoinGameRequest(null, gameToObserve.gameID());
-        server.joinGame(authToken, joinGameRequest);
-        */
+        // --- THIS IS THE NEW LOGIC ---
+        this.ws = new WebSocketFacade(this.serverUrl, this);
+        UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameToObserve.gameID());
+        ws.sendCommand(command);
 
-        boardPrinter.printBoard(gameToObserve.game(), ChessGame.TeamColor.WHITE);
+        // Note: We don't print the board here manually anymore.
+        // The server will send a LOAD_GAME message via WebSocket, which triggers 'notify()'.
+        // -----------------------------
 
         return "";
     }
@@ -286,6 +326,58 @@ public class Repl {
         }
         return null;
     }
+
+    private String gameplayEval(String input) {
+        try {
+            String[] args = input.split(" ");
+            String command = args[0].toLowerCase();
+
+            return switch (command) {
+                case "help" -> helpGameplay();
+                case "redraw" -> {
+                    // Manually print the board using the saved game state
+                    // (We need to save the 'currentGame' state when LOAD_GAME arrives to do this reliably,
+                    // but for now we can just ask for a refresh or rely on the last printed board)
+                    // Better yet: Just print the board stored in the Repl if you track it,
+                    // OR just return "" and rely on the user knowing the state.
+                    // Actually, the easiest way is to just output a newline for now, or fix the UI later to store the 'currentBoard'.
+                    yield "Board redraw not fully implemented locally yet.";
+                }
+                case "leave" -> leaveHandler();
+                case "move" -> makeMoveHandler(args);
+                case "resign" -> resignHandler();
+                case "highlight" -> highlightHandler(args);
+                default -> "Unknown command. Type 'help' for options.";
+            };
+        } catch (Exception e) {
+            return "Error: " + e.getMessage();
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public String help() {
         if(!isLoggedIn) {
@@ -327,4 +419,28 @@ public class Repl {
         }
     }
 
+    @Override
+    public void notify(ServerMessage message) {
+        switch (message.getServerMessageType()) {
+            case LOAD_GAME -> {
+                LoadGameMessage loadMsg = new Gson().fromJson(new Gson().toJson(message), LoadGameMessage.class);
+
+                System.out.println();
+                boardPrinter.printBoard(loadMsg.getGame(), chess.ChessGame.TeamColor.WHITE);
+                printPrompt();
+            }
+            case NOTIFICATION -> {
+                NotificationMessage notification = new Gson().fromJson(new Gson().toJson(message), NotificationMessage.class);
+                System.out.println();
+                System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + notification.getMessage() + EscapeSequences.RESET_TEXT_COLOR);
+                printPrompt();
+            }
+            case ERROR -> {
+                ErrorMessage error = new Gson().fromJson(new Gson().toJson(message), ErrorMessage.class);
+                System.out.println();
+                System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + error.getMessage() + EscapeSequences.RESET_TEXT_COLOR);
+                printPrompt();
+            }
+        }
+    }
 }

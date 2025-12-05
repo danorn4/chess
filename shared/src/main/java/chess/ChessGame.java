@@ -12,9 +12,9 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessGame {
-
     private ChessBoard board;
     private TeamColor currentTurn;
+    private boolean isGameOver = false;
 
     public ChessGame() {
         this.board = new ChessBoard();
@@ -257,6 +257,14 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return board;
+    }
+
+    public boolean isGameOver() {
+        return isGameOver;
+    }
+
+    public void setGameOver(boolean gameOver) {
+        this.isGameOver = gameOver;
     }
 
     @Override
