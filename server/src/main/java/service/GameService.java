@@ -55,8 +55,8 @@ public class GameService {
 
         GameData game = dataAccess.getGame(request.gameID());
 
-        if (playerColor == null) {
-            return;
+        if (playerColor == null || playerColor.isEmpty()) {
+            throw new DataAccessException("bad request");
         }
         if (playerColor.equals("WHITE")) {
             if (game.whiteUsername() != null) {
@@ -97,7 +97,7 @@ public class GameService {
         try {
             game.makeMove(move);
         } catch (InvalidMoveException e) {
-            throw new DataAccessException("Error: Invalid move: " + e.getMessage());
+            throw new DataAccessException("Invalid move: " + e.getMessage());
         }
 
         GameData updatedGame = new GameData(
@@ -115,16 +115,16 @@ public class GameService {
         ChessGame game = gameData.game();
 
         if (game.getTeamTurn() == null) {
-            throw new DataAccessException("Error: Game is over");
+            throw new DataAccessException("Game is over");
         }
 
         if (game.getTeamTurn() == ChessGame.TeamColor.WHITE) {
             if (!username.equals(gameData.whiteUsername())) {
-                throw new DataAccessException("Error: Not your turn (or you are not the white player)");
+                throw new DataAccessException("Not your turn (or you are not the white player)");
             }
         } else {
             if (!username.equals(gameData.blackUsername())) {
-                throw new DataAccessException("Error: Not your turn (or you are not the black player)");
+                throw new DataAccessException("Not your turn (or you are not the black player)");
             }
         }
         return game;
@@ -159,11 +159,11 @@ public class GameService {
         ChessGame game = gameData.game();
 
         if (!Objects.equals(gameData.whiteUsername(), username) && !Objects.equals(gameData.blackUsername(), username)) {
-            throw new DataAccessException("Error: Observer cannot resign");
+            throw new DataAccessException("Observer cannot resign");
         }
 
         if (game.getTeamTurn() == null) {
-            throw new DataAccessException("Error: Game is already over");
+            throw new DataAccessException("Game is already over");
         }
 
         game.setTeamTurn(null);
