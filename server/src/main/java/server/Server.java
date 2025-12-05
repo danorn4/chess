@@ -1,7 +1,6 @@
 package server;
 
 import com.google.gson.Gson;
-import com.mysql.cj.Session;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.SQLDataAccess;
@@ -43,7 +42,7 @@ public class Server {
             this.gameService = new GameService(dataAccess);
             this.clearService = new ClearService(dataAccess);
 
-            this.webSocketHandler = new WebSocketHandler();
+            this.webSocketHandler = new WebSocketHandler(userService, gameService);
 
         } catch (DataAccessException e) {
             System.err.println("FATAL: Failed to initialize database connection.");
@@ -64,9 +63,10 @@ public class Server {
 
         javalin.ws("/ws", ws -> {
             ws.onMessage(ctx -> {
-                webSocketHandler.onMessage((ctx.session, ctx.message());
+                webSocketHandler.onMessage(ctx.session, ctx.message());
             });
         });
+
         javalin.exception(DataAccessException.class, this::handleDataAccessException);
         javalin.exception(Exception.class, this::handleGenericException);
     }

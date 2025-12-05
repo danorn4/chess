@@ -53,5 +53,11 @@ public class UserService {
         dataAccess.deleteAuth(authToken);
     }
 
-
+    public AuthData getAuth(String authToken) throws DataAccessException {
+        AuthData auth = dataAccess.getAuth(authToken);
+        if (auth == null) {
+            throw new DataAccessException("unauthorized");
+        }
+        return auth;
+    }
 }

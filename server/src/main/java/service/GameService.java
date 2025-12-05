@@ -1,5 +1,9 @@
 package service;
 
+import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
+
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import model.AuthData;
@@ -81,5 +85,40 @@ public class GameService {
         }
     }
 
+    public void makeMove(String authToken, Integer gameID, ChessMove move) throws DataAccessException {
+        AuthData auth = authenticate(authToken);
+        String username = auth.username();
 
+        GameData gameData = dataAccess.getGame(gameID);
+        ChessGame game = gameData.game();
+
+        if (game.getTeamTurn() == ChessGame.TeamColor.WHITE) {
+            if (!username.equals(gameData.whiteUsername())) {
+                throw new DataAccessException("Error: Not your turn (or you are not the white player)");
+            }
+        } else {
+            if (!username.equals(gameData.blackUsername())) {
+                throw new DataAccessException("Error: Not your turn (or you are not the black player)");
+            }
+        }
+
+        try {
+            game.makeMove(move);
+        } catch (InvalidMoveException e) {
+            throw new DataAccessException("Error: Invalid move: " + e.getMessage());
+        }
+
+        GameData updatedGame = new GameData(
+                gameID,
+                gameData.whiteUsername(),
+                gameData.blackUsername(),
+                gameData.gameName(),
+                game
+        );
+        dataAccess.updateGame(gameID, updatedGame);
+    }
+
+    public GameData getGame(int gameID) throws DataAccessException {
+        return dataAccess.getGame(gameID);
+    }
 }
