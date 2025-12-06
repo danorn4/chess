@@ -1,8 +1,6 @@
 package client.websocket;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import exception.ResponseException;
 import jakarta.websocket.*;
 import websocket.commands.UserGameCommand;
@@ -11,7 +9,6 @@ import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
-// Using javax.websocket for Tyrus
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -33,24 +30,27 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
+                    System.out.println("DEBUG: Received JSON: " + message);
+
                     try {
-                        JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
+                        ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
 
-                        String typeString = jsonObject.get("serverMessageType").getAsString();
-
-                        ServerMessage.ServerMessageType type = ServerMessage.ServerMessageType.valueOf(typeString);
-
-                        switch (type) {
-                            case LOAD_GAME -> notificationHandler.notify(new Gson().fromJson(message, LoadGameMessage.class));
+                        switch (serverMessage.getServerMessageType()) {
+                            case LOAD_GAME -> {
+                                LoadGameMessage msg = new Gson().fromJson(message, LoadGameMessage.class);
+                                System.out.println("DEBUG: LOAD_GAME received. Game object: " + msg.getGame());
+                                notificationHandler.notify(msg);
+                            }
                             case ERROR -> notificationHandler.notify(new Gson().fromJson(message, ErrorMessage.class));
                             case NOTIFICATION -> notificationHandler.notify(new Gson().fromJson(message, NotificationMessage.class));
                         }
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         System.out.println("CRITICAL CLIENT ERROR: " + e.getMessage());
                         e.printStackTrace();
                     }
                 }
             });
+
         } catch (DeploymentException | IOException | URISyntaxException ex) {
             throw new ResponseException(500, "Unable to connect to server: " + ex.getMessage());
         }
@@ -60,9 +60,6 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    /**
-     * A generic method to send any command (CONNECT, MAKE_MOVE, etc.) to the server.
-     */
     public void sendCommand(UserGameCommand command) throws ResponseException {
         try {
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
@@ -70,5 +67,4 @@ public class WebSocketFacade extends Endpoint {
             throw new ResponseException(500, ex.getMessage());
         }
     }
-
 }

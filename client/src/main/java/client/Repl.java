@@ -13,6 +13,7 @@ import model.UserData;
 import servicehelpers.JoinGameRequest;
 
 import ui.BoardPrinter;
+import ui.ClientDisplay;
 import ui.EscapeSequences;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
@@ -33,6 +34,9 @@ public class Repl implements NotificationHandler {
     private Integer currentGameID = null;
     private ChessGame.TeamColor playerColor = null;
     private ChessGame currentGame = null;
+    private final Scanner scanner;
+
+    private final ClientDisplay display = new ClientDisplay();
 
     private final String serverUrl;
     private WebSocketFacade ws;
@@ -44,28 +48,22 @@ public class Repl implements NotificationHandler {
     public Repl(String serverUrl) {
         this.server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
+        this.scanner = new Scanner(System.in);
     }
 
     public void run() {
-        System.out.println("Welcome to 240 chess. Type Help to get started.");
-
-        Scanner scanner = new Scanner(System.in);
+        display.printWelcome();
         String result;
-
         do {
-            printPrompt();
+            display.printPrompt(isLoggedIn, currentGameID);
             String input = scanner.nextLine();
             result = eval(input);
-            if (result != null && !result.isEmpty()) {
-                System.out.println(result);
-            }
+            display.printResult(result);
         } while (result == null || !result.equals("quit"));
-        System.out.println("Goodbye!");
+        display.printGoodbye();
     }
 
     private void gameplayLoop() {
-        Scanner scanner = new Scanner(System.in);
-
         while (true) {
             System.out.print("[GAMEPLAY] >>> ");
             String line = scanner.nextLine();
@@ -185,53 +183,12 @@ public class Repl implements NotificationHandler {
         }
 
         Collection<GameData> listGames = server.listGames(authToken);
+
         this.listGames = listGames;
 
-        if (listGames == null || listGames.isEmpty()) {
-            return "No games available.";
-        }
+        display.printGameList(listGames);
 
-        StringBuilder sb = new StringBuilder();
-        int listCount = 1;
-
-        String numColor = EscapeSequences.SET_TEXT_COLOR_WHITE;
-        String nameColor = EscapeSequences.SET_TEXT_BOLD + EscapeSequences.SET_TEXT_COLOR_YELLOW;
-        String infoColor = EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY;
-        String playerColor = EscapeSequences.SET_TEXT_BOLD + EscapeSequences.SET_TEXT_COLOR_WHITE;
-        String reset = EscapeSequences.RESET_TEXT_BOLD_FAINT + EscapeSequences.RESET_TEXT_COLOR;
-
-
-        for (GameData gameData : listGames) {
-            String gameName = gameData.gameName();
-            String whiteUsername = gameData.whiteUsername() != null ? gameData.whiteUsername() : "<empty>";
-            String blackUsername = gameData.blackUsername() != null ? gameData.blackUsername() : "<empty>";
-
-            sb.append(numColor);
-            sb.append(String.format("%d. ", listCount++));
-
-            sb.append(nameColor);
-            sb.append(gameName);
-
-            sb.append(infoColor);
-            sb.append(" (White: ");
-
-            sb.append(playerColor);
-            sb.append(whiteUsername);
-
-            sb.append(infoColor);
-            sb.append(", Black: ");
-
-            sb.append(playerColor);
-            sb.append(blackUsername);
-
-            sb.append(infoColor);
-            sb.append(")");
-
-            sb.append(reset);
-            sb.append("\n");
-        }
-
-        return sb.toString();
+        return "";
     }
 
 
@@ -342,10 +299,14 @@ public class Repl implements NotificationHandler {
     }
 
 
-    private String leaveHandler() throws ResponseException {
-        if (ws != null) {
-            UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, currentGameID);
-            ws.sendCommand(command);
+    private String leaveHandler() {
+        try {
+            if (ws != null) {
+                UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, currentGameID);
+                ws.sendCommand(command);
+            }
+        } catch (ResponseException e) {
+            System.out.println("Notice: Disconnected from server while leaving.");
         }
 
         this.currentGameID = null;
@@ -358,7 +319,6 @@ public class Repl implements NotificationHandler {
 
     private String resignHandler() throws ResponseException {
         System.out.print("Are you sure you want to resign? (yes/no): ");
-        Scanner scanner = new Scanner(System.in);
         String answer = scanner.nextLine().trim().toLowerCase();
 
         if (!answer.equals("yes")) {
@@ -464,53 +424,14 @@ public class Repl implements NotificationHandler {
         }
     }
 
-    private String helpGameplay() {
-        return String.format(
-                "%s  redraw%s %s: Redraws the chess board%n" +
-                        "%s  leave%s %s: Removes you from the game%n" +
-                        "%s  move <START> <END> [PROMOTION]%s %s: Make a move (e.g., 'move e2 e4')%n" +
-                        "%s  resign%s %s: Forfeit the game%n" +
-                        "%s  highlight%s %s: Highlight legal moves for a piece%n" +
-                        "%s  help%s %s: Show this message",
-                CMD_COLOR, RESET, DESC_COLOR,
-                CMD_COLOR, RESET, DESC_COLOR,
-                CMD_COLOR, RESET, DESC_COLOR,
-                CMD_COLOR, RESET, DESC_COLOR,
-                CMD_COLOR, RESET, DESC_COLOR,
-                CMD_COLOR, RESET, DESC_COLOR
-        );
+    public String helpGameplay() {
+        display.printGameplayHelp();
+        return "";
     }
 
     public String help() {
-        if(!isLoggedIn) {
-            return String.format(
-                    "%s  register <USERNAME> <PASSWORD> <EMAIL>%s %s: to create an account%n" +
-                            "%s  login <USERNAME> <PASSWORD>%s %s: to play chess%n" +
-                            "%s  quit%s %s: playing chess%n" +
-                            "%s  help%s %s: with possible commands%s",
-                    CMD_COLOR, RESET, DESC_COLOR,
-                    CMD_COLOR, RESET, DESC_COLOR,
-                    CMD_COLOR, RESET, DESC_COLOR,
-                    CMD_COLOR, RESET, DESC_COLOR, RESET
-            );
-        } else {
-            return String.format(
-                    "%s  create <GAME_NAME>%s %s: a game%n" +
-                            "%s  list%s %s: games%n" +
-                            "%s  join <GAME_ID> [WHITE|BLACK]%s %s: a game%n" +
-                            "%s  observe <GAME_ID>%s %s: a game%n" +
-                            "%s  logout%s %s: when you are done%n" +
-                            "%s  quit%s %s: playing chess%n" +
-                            "%s  help%s %s: with possible commands%s",
-                    CMD_COLOR, RESET, DESC_COLOR,
-                    CMD_COLOR, RESET, DESC_COLOR,
-                    CMD_COLOR, RESET, DESC_COLOR,
-                    CMD_COLOR, RESET, DESC_COLOR,
-                    CMD_COLOR, RESET, DESC_COLOR,
-                    CMD_COLOR, RESET, DESC_COLOR,
-                    CMD_COLOR, RESET, DESC_COLOR, RESET
-            );
-        }
+        display.printHelp(isLoggedIn);
+        return "";
     }
 
     private void printPrompt() {
@@ -528,25 +449,18 @@ public class Repl implements NotificationHandler {
         switch (message.getServerMessageType()) {
             case LOAD_GAME -> {
                 LoadGameMessage loadMsg = (LoadGameMessage) message;
-
                 this.currentGame = loadMsg.getGame();
-                System.out.println();
-
                 ChessGame.TeamColor perspective = (this.playerColor != null) ? this.playerColor : ChessGame.TeamColor.WHITE;
-                boardPrinter.printBoard(this.currentGame, perspective);
-                printPrompt();
+                display.printBoard(this.currentGame, perspective);
+                display.printPrompt(isLoggedIn, currentGameID);
             }
             case NOTIFICATION -> {
-                NotificationMessage notification = (NotificationMessage) message;
-                System.out.println();
-                System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + notification.getMessage() + EscapeSequences.RESET_TEXT_COLOR);
-                printPrompt();
+                display.printNotification((NotificationMessage) message);
+                display.printPrompt(isLoggedIn, currentGameID);
             }
             case ERROR -> {
-                ErrorMessage error = (ErrorMessage) message;
-                System.out.println();
-                System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + error.getErrorMessage() + EscapeSequences.RESET_TEXT_COLOR);
-                printPrompt();
+                display.printError((ErrorMessage) message);
+                display.printPrompt(isLoggedIn, currentGameID);
             }
         }
     }
