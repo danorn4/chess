@@ -84,7 +84,8 @@ public class WebSocketHandler {
             ChessMove move = command.getMove();
             String moveString = String.format("%s to %s", positionToString(move.getStartPosition()), positionToString(move.getEndPosition()));
 
-            String message = String.format("%s made a move: %s", username, moveString);            NotificationMessage notification = new NotificationMessage(message);
+            String message = String.format("%s made a move: %s", username, moveString);
+            NotificationMessage notification = new NotificationMessage(message);
             connections.broadcast(command.getGameID(), command.getAuthToken(), notification);
 
             ChessGame.TeamColor opponentColor;
