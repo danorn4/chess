@@ -39,7 +39,7 @@ public class ClientDisplay {
 
     public void printHelp(boolean isLoggedIn) {
         if (!isLoggedIn) {
-            System.out.print(String.format(
+            System.out.printf(
                     "%s  register <USERNAME> <PASSWORD> <EMAIL>%s %s: to create an account%n" +
                             "%s  login <USERNAME> <PASSWORD>%s %s: to play chess%n" +
                             "%s  quit%s %s: playing chess%n" +
@@ -52,9 +52,9 @@ public class ClientDisplay {
                     SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
                     SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR,
                     SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA, RESET_TEXT_ITALIC + RESET_TEXT_COLOR
-            ));
+            );
         } else {
-            System.out.print(String.format(
+            System.out.printf(
                     "%s  create <GAME_NAME>%s %s: a game%n" +
                             "%s  list%s %s: games%n" +
                             "%s  join <GAME_ID> [WHITE|BLACK]%s %s: a game%n" +
@@ -76,18 +76,18 @@ public class ClientDisplay {
                     SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
                     SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR,
                     SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA, RESET_TEXT_ITALIC + RESET_TEXT_COLOR
-            ));
+            );
         }
     }
 
     public void printGameplayHelp() {
-        System.out.print(String.format(
+        System.out.printf(
                 "%s  redraw%s %s: Redraws the chess board%n" +
                         "%s  leave%s %s: Removes you from the game%n" +
                         "%s  move <START> <END> [PROMOTION]%s %s: Make a move (e.g., 'move e2 e4')%n" +
                         "%s  resign%s %s: Forfeit the game%n" +
                         "%s  highlight%s %s: Highlight legal moves for a piece%n" +
-                        "%s  help%s %s: Show this message%n",
+                        "%s  help%s %s: Show this message%s%n",
                 SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR,
                 SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
                 SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR,
@@ -98,9 +98,11 @@ public class ClientDisplay {
                 SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
                 SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR,
                 SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
-                SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR,
-                SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA
-        ));
+                SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE,
+                RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR,
+                SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
+                RESET_TEXT_ITALIC + RESET_TEXT_COLOR
+        );
     }
 
     public void printGameList(Collection<GameData> listGames) {
