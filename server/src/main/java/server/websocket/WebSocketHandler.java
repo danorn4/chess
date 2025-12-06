@@ -54,13 +54,20 @@ public class WebSocketHandler {
     private void connect(Session session, String username, UserGameCommand command) throws IOException {
         try {
             GameData game = gameService.getGame(command.getGameID());
-
             connections.add(command.getAuthToken(), command.getGameID(), session);
 
             var loadGameMsg = new LoadGameMessage(game.game());
             session.getRemote().sendString(new Gson().toJson(loadGameMsg));
 
-            var message = String.format("%s joined the game", username);
+            String message;
+            if (username.equals(game.whiteUsername())) {
+                message = String.format("%s joined the game as WHITE", username);
+            } else if (username.equals(game.blackUsername())) {
+                message = String.format("%s joined the game as BLACK", username);
+            } else {
+                message = String.format("%s joined the game as an observer", username);
+            }
+
             var notification = new NotificationMessage(message);
             connections.broadcast(command.getGameID(), command.getAuthToken(), notification);
 
