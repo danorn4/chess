@@ -6,7 +6,6 @@ import chess.ChessPiece;
 import chess.ChessPosition;
 import client.websocket.NotificationHandler;
 import client.websocket.WebSocketFacade;
-import com.google.gson.Gson;
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
@@ -253,7 +252,6 @@ public class Repl implements NotificationHandler {
             return "Error: Invalid Color. Must be WHITE or BLACK.";
         }
 
-        // FIX: Set the player color and game ID correctly before connecting
         this.playerColor = ChessGame.TeamColor.valueOf(playerColorStr);
         this.currentGameID = gameToJoin.gameID();
 
@@ -281,7 +279,6 @@ public class Repl implements NotificationHandler {
             return "Error: Invalid game number. Run \"list\" to see list of available games.";
         }
 
-        // FIX: Set default observer state
         this.playerColor = ChessGame.TeamColor.WHITE;
         this.currentGameID = gameToObserve.gameID();
 
@@ -326,7 +323,6 @@ public class Repl implements NotificationHandler {
             return switch (command) {
                 case "help" -> helpGameplay();
                 case "redraw" -> {
-                    // FIX: Actually redraw the board using stored state
                     if (currentGame != null) {
                         System.out.println();
                         boardPrinter.printBoard(currentGame, playerColor);
@@ -347,20 +343,20 @@ public class Repl implements NotificationHandler {
 
 
     private String leaveHandler() throws ResponseException {
-        // 1. Send LEAVE command via WebSocket
-        // (You need the gameID. You can store it in a class field 'currentGameID' inside joinHandler)
         if (ws != null) {
             UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, currentGameID);
             ws.sendCommand(command);
         }
 
-        // 2. Return the magic string to break the loop
+        this.currentGameID = null;
+        this.playerColor = null;
+        this.currentGame = null;
+
         return "Left the game";
     }
 
 
     private String resignHandler() throws ResponseException {
-        // Optional: Ask for confirmation here with Scanner
         System.out.print("Are you sure you want to resign? (yes/no): ");
         Scanner scanner = new Scanner(System.in);
         String answer = scanner.nextLine().trim().toLowerCase();
@@ -385,7 +381,6 @@ public class Repl implements NotificationHandler {
         String endStr = args[2];
         String promotion = (args.length > 3) ? args[3].toUpperCase() : null;
 
-        // Helper to convert "e2" to ChessPosition (implement this!)
         ChessPosition start = parsePosition(startStr);
         ChessPosition end = parsePosition(endStr);
 
@@ -395,23 +390,44 @@ public class Repl implements NotificationHandler {
 
         ChessPiece.PieceType promoPiece = null;
         if (promotion != null) {
-            // Convert string "QUEEN" to PieceType.QUEEN
             promoPiece = parsePieceType(promotion);
         }
 
         ChessMove move = new ChessMove(start, end, promoPiece);
 
-        // Create the specialized MakeMoveCommand (you created this in Shared earlier)
-        // Wait, you need to update WebSocketFacade.sendCommand to handle MakeMoveCommand
-        // OR just cast it if sendCommand takes UserGameCommand (inheritance).
         MakeMoveCommand command = new MakeMoveCommand(authToken, currentGameID, move);
         ws.sendCommand(command);
 
-        return ""; // Success! Server will send LOAD_GAME.
+        return "";
     }
 
     private String highlightHandler(String[] args) {
-        return "Highlight feature coming soon.";
+        if (args.length != 2) {
+            return "Error: Invalid command. Usage: highlight <POSITION> (e.g., highlight e2)";
+        }
+
+        if (currentGame == null) {
+            return "Error: No game currently loaded. Join or observe a game first.";
+        }
+
+        String positionStr = args[1];
+        ChessPosition position = parsePosition(positionStr);
+
+        if (position == null) {
+            return "Error: Invalid position. Use format 'e2'.";
+        }
+
+        if (currentGame.getBoard().getPiece(position) == null) {
+            return "Error: No piece at " + positionStr;
+        }
+
+        Collection<ChessMove> validMoves = currentGame.validMoves(position);
+
+        System.out.println();
+        boardPrinter.printBoardWithHighlights(currentGame, playerColor, position, validMoves);
+        System.out.println();
+
+        return "";
     }
 
     private ChessPosition parsePosition(String positionStr) {
@@ -420,16 +436,13 @@ public class Repl implements NotificationHandler {
                 return null;
             }
 
-            char colChar = positionStr.charAt(0); // 'e'
-            char rowChar = positionStr.charAt(1); // '2'
+            char colChar = positionStr.charAt(0);
+            char rowChar = positionStr.charAt(1);
 
-            // Convert 'a'-'h' to 1-8
             int col = colChar - 'a' + 1;
 
-            // Convert '1'-'8' to 1-8
             int row = Character.getNumericValue(rowChar);
 
-            // Validate range
             if (col < 1 || col > 8 || row < 1 || row > 8) {
                 return null;
             }
@@ -445,10 +458,8 @@ public class Repl implements NotificationHandler {
             return null;
         }
         try {
-            // Try to match the enum name exactly (e.g., "QUEEN")
             return ChessPiece.PieceType.valueOf(pieceString.toUpperCase());
         } catch (IllegalArgumentException e) {
-            // If they typed something invalid, return null (or handle error)
             return null;
         }
     }
@@ -471,7 +482,6 @@ public class Repl implements NotificationHandler {
     }
 
     public String help() {
-        // ... (help implementation remains unchanged) ...
         if(!isLoggedIn) {
             return String.format(
                     "%s  register <USERNAME> <PASSWORD> <EMAIL>%s %s: to create an account%n" +
@@ -506,6 +516,8 @@ public class Repl implements NotificationHandler {
     private void printPrompt() {
         if (!isLoggedIn) {
             System.out.print("[LOGGED_OUT] >>> ");
+        } else if (currentGameID != null) {
+            System.out.print("[GAMEPLAY] >>> ");
         } else {
             System.out.print("[LOGGED_IN] >>> ");
         }
@@ -515,26 +527,26 @@ public class Repl implements NotificationHandler {
     public void notify(ServerMessage message) {
         switch (message.getServerMessageType()) {
             case LOAD_GAME -> {
-                LoadGameMessage loadMsg = new Gson().fromJson(new Gson().toJson(message), LoadGameMessage.class);
+                LoadGameMessage loadMsg = (LoadGameMessage) message;
+
                 this.currentGame = loadMsg.getGame();
                 System.out.println();
-                // FIX: Use dynamic playerColor, defaulting to WHITE if null
+
                 ChessGame.TeamColor perspective = (this.playerColor != null) ? this.playerColor : ChessGame.TeamColor.WHITE;
-                boardPrinter.printBoard(loadMsg.getGame(), perspective);
-                System.out.println();
-                System.out.print("[GAMEPLAY] >>> "); // Reprint prompt for clarity
+                boardPrinter.printBoard(this.currentGame, perspective);
+                printPrompt();
             }
             case NOTIFICATION -> {
-                NotificationMessage notification = new Gson().fromJson(new Gson().toJson(message), NotificationMessage.class);
+                NotificationMessage notification = (NotificationMessage) message;
                 System.out.println();
                 System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + notification.getMessage() + EscapeSequences.RESET_TEXT_COLOR);
-                System.out.print("[GAMEPLAY] >>> ");
+                printPrompt();
             }
             case ERROR -> {
-                ErrorMessage error = new Gson().fromJson(new Gson().toJson(message), ErrorMessage.class);
+                ErrorMessage error = (ErrorMessage) message;
                 System.out.println();
-                System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + error.getMessage() + EscapeSequences.RESET_TEXT_COLOR);
-                System.out.print("[GAMEPLAY] >>> ");
+                System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + error.getErrorMessage() + EscapeSequences.RESET_TEXT_COLOR);
+                printPrompt();
             }
         }
     }

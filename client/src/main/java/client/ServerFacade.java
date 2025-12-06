@@ -151,8 +151,7 @@ public class ServerFacade {
 
     private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, ResponseException {
         var status = http.getResponseCode();
-        if (status / 100 != 2) { // Check if not a 2xx success code
-            // Read the error body
+        if (status / 100 != 2) {
             String errorBody;
             try (InputStream errorStream = http.getErrorStream()) {
                 errorBody = new String(errorStream.readAllBytes());
@@ -160,16 +159,12 @@ public class ServerFacade {
 
             String message;
             try {
-                // 1. Parse the JSON error body
                 ErrorMessage errorResponse = new Gson().fromJson(errorBody, ErrorMessage.class);
-                // 2. Get the clean message from the JSON
                 message = errorResponse.message();
             } catch (Exception e) {
-                // If parsing fails, just use the raw body
                 message = errorBody;
             }
 
-            // 3. Throw an exception with the *clean* message
             throw new ResponseException(status, message);
         }
     }
@@ -180,7 +175,6 @@ public class ServerFacade {
             try (InputStream respBody = http.getInputStream()) {
                 InputStreamReader reader = new InputStreamReader(respBody);
                 if (responseType != null) {
-                    // This simple line now works for everything
                     response = new Gson().fromJson(reader, responseType);
                 }
             }

@@ -35,7 +35,6 @@ public class WebSocketHandler {
         try {
             UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
 
-            // 1. Verify the User (The "Gatekeeper")
             AuthData auth = userService.getAuth(command.getAuthToken());
             String username = auth.username();
 
@@ -52,17 +51,13 @@ public class WebSocketHandler {
 
     private void connect(Session session, String username, UserGameCommand command) throws IOException {
         try {
-            // 1. Get the game
             GameData game = gameService.getGame(command.getGameID());
 
-            // 2. Add connection to the manager
             connections.add(command.getAuthToken(), command.getGameID(), session);
 
-            // 3. Send LOAD_GAME to the root client
             var loadGameMsg = new LoadGameMessage(game.game());
             session.getRemote().sendString(new Gson().toJson(loadGameMsg));
 
-            // 4. Notify everyone else
             var message = String.format("%s joined the game", username);
             var notification = new NotificationMessage(message);
             connections.broadcast(command.getGameID(), command.getAuthToken(), notification);
@@ -82,7 +77,7 @@ public class WebSocketHandler {
             ChessGame game = gameData.game();
 
             LoadGameMessage loadMsg = new LoadGameMessage(game);
-            connections.broadcast(command.getGameID(), "", loadMsg); // "" means send to everyone
+            connections.broadcast(command.getGameID(), "", loadMsg);
 
             String message = String.format("%s made a move: %s", username, command.getMove().toString());
             NotificationMessage notification = new NotificationMessage(message);

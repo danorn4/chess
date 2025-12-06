@@ -97,7 +97,7 @@ public class GameService {
         try {
             game.makeMove(move);
         } catch (InvalidMoveException e) {
-            throw new DataAccessException("Invalid move: " + e.getMessage());
+            throw new DataAccessException(e.getMessage());
         }
 
         GameData updatedGame = new GameData(

@@ -1,9 +1,14 @@
 package client.websocket;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import exception.ResponseException;
 import jakarta.websocket.*;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 // Using javax.websocket for Tyrus
@@ -18,23 +23,32 @@ public class WebSocketFacade extends Endpoint {
 
     public WebSocketFacade(String url, NotificationHandler notificationHandler) throws ResponseException {
         try {
-            // 1. Convert http url to ws url (http://localhost:8080 -> ws://localhost:8080)
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
             this.notificationHandler = notificationHandler;
 
-            // 2. Open the connection
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
 
-            // 3. Set up the message handler (Receiver)
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    // Deserialize the JSON string from the server into a ServerMessage
-                    ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
-                    // Notify the UI (Repl) so it can redraw the board or print text
-                    notificationHandler.notify(serverMessage);
+                    try {
+                        JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
+
+                        String typeString = jsonObject.get("serverMessageType").getAsString();
+
+                        ServerMessage.ServerMessageType type = ServerMessage.ServerMessageType.valueOf(typeString);
+
+                        switch (type) {
+                            case LOAD_GAME -> notificationHandler.notify(new Gson().fromJson(message, LoadGameMessage.class));
+                            case ERROR -> notificationHandler.notify(new Gson().fromJson(message, ErrorMessage.class));
+                            case NOTIFICATION -> notificationHandler.notify(new Gson().fromJson(message, NotificationMessage.class));
+                        }
+                    } catch (Exception e) {
+                        System.out.println("CRITICAL CLIENT ERROR: " + e.getMessage());
+                        e.printStackTrace();
+                    }
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
@@ -42,7 +56,6 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-    // Endpoint requires this method, but we don't need custom logic here
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
@@ -52,7 +65,6 @@ public class WebSocketFacade extends Endpoint {
      */
     public void sendCommand(UserGameCommand command) throws ResponseException {
         try {
-            // Serialize the command object to JSON and send it
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
