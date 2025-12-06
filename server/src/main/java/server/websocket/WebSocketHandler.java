@@ -1,6 +1,8 @@
 package server.websocket;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import model.AuthData;
@@ -79,8 +81,10 @@ public class WebSocketHandler {
             LoadGameMessage loadMsg = new LoadGameMessage(game);
             connections.broadcast(command.getGameID(), "", loadMsg);
 
-            String message = String.format("%s made a move: %s", username, command.getMove().toString());
-            NotificationMessage notification = new NotificationMessage(message);
+            ChessMove move = command.getMove();
+            String moveString = String.format("%s to %s", positionToString(move.getStartPosition()), positionToString(move.getEndPosition()));
+
+            String message = String.format("%s made a move: %s", username, moveString);            NotificationMessage notification = new NotificationMessage(message);
             connections.broadcast(command.getGameID(), command.getAuthToken(), notification);
 
             ChessGame.TeamColor opponentColor;
@@ -115,6 +119,11 @@ public class WebSocketHandler {
         } catch (DataAccessException e) {
             sendError(session, "Error: " + e.getMessage());
         }
+    }
+
+    private String positionToString(ChessPosition pos) {
+        char col = (char) ('a' + pos.getColumn() - 1);
+        return "" + col + pos.getRow();
     }
 
     private void leave(Session session, String username, UserGameCommand command) throws IOException {

@@ -319,6 +319,7 @@ public class Repl implements NotificationHandler {
 
     private String resignHandler() throws ResponseException {
         System.out.print("Are you sure you want to resign? (yes/no): ");
+        Scanner scanner = new Scanner(System.in);
         String answer = scanner.nextLine().trim().toLowerCase();
 
         if (!answer.equals("yes")) {

@@ -6,7 +6,6 @@ import websocket.messages.ErrorMessage;
 import websocket.messages.NotificationMessage;
 
 import java.util.Collection;
-import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
 
@@ -45,10 +44,14 @@ public class ClientDisplay {
                             "%s  login <USERNAME> <PASSWORD>%s %s: to play chess%n" +
                             "%s  quit%s %s: playing chess%n" +
                             "%s  help%s %s: with possible commands%s%n",
-                    SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR, SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
-                    SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR, SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
-                    SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR, SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
-                    SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR, SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA, RESET_TEXT_ITALIC + RESET_TEXT_COLOR
+                    SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR,
+                    SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
+                    SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR,
+                    SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
+                    SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR,
+                    SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
+                    SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR,
+                    SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA, RESET_TEXT_ITALIC + RESET_TEXT_COLOR
             ));
         } else {
             System.out.print(String.format(
@@ -59,13 +62,20 @@ public class ClientDisplay {
                             "%s  logout%s %s: when you are done%n" +
                             "%s  quit%s %s: playing chess%n" +
                             "%s  help%s %s: with possible commands%s%n",
-                    SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR, SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
-                    SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR, SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
-                    SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR, SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
-                    SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR, SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
-                    SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR, SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
-                    SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR, SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
-                    SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR, SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA, RESET_TEXT_ITALIC + RESET_TEXT_COLOR
+                    SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR,
+                    SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
+                    SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR,
+                    SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
+                    SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR,
+                    SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
+                    SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR,
+                    SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
+                    SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR,
+                    SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
+                    SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR,
+                    SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
+                    SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR,
+                    SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA, RESET_TEXT_ITALIC + RESET_TEXT_COLOR
             ));
         }
     }
@@ -78,12 +88,18 @@ public class ClientDisplay {
                         "%s  resign%s %s: Forfeit the game%n" +
                         "%s  highlight%s %s: Highlight legal moves for a piece%n" +
                         "%s  help%s %s: Show this message%n",
-                SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR, SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
-                SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR, SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
-                SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR, SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
-                SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR, SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
-                SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR, SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
-                SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR, SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA
+                SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR,
+                SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
+                SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR,
+                SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
+                SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR,
+                SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
+                SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR,
+                SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
+                SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR,
+                SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA,
+                SET_TEXT_BOLD + SET_TEXT_COLOR_BLUE, RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR,
+                SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA
         ));
     }
 
@@ -101,14 +117,14 @@ public class ClientDisplay {
 
         for (GameData gameData : listGames) {
             String gameName = gameData.gameName();
-            String whiteUsername = gameData.whiteUsername() != null ? gameData.whiteUsername() : "<empty>";
-            String blackUsername = gameData.blackUsername() != null ? gameData.blackUsername() : "<empty>";
+            String white = gameData.whiteUsername() != null ? gameData.whiteUsername() : "<empty>";
+            String black = gameData.blackUsername() != null ? gameData.blackUsername() : "<empty>";
 
             System.out.printf("%s%d. %s%s%s (White: %s%s%s, Black: %s%s%s)%s%n",
                     SET_TEXT_COLOR_WHITE, listCount++,
                     nameColor, gameName, infoColor,
-                    playerColor, whiteUsername, infoColor,
-                    playerColor, blackUsername, infoColor,
+                    playerColor, white, infoColor,
+                    playerColor, black, infoColor,
                     reset);
         }
     }
@@ -119,7 +135,9 @@ public class ClientDisplay {
         System.out.println();
     }
 
-    public void printBoardWithHighlights(ChessGame game, ChessGame.TeamColor perspective, chess.ChessPosition pos, Collection<chess.ChessMove> moves) {
+    public void printBoardWithHighlights(ChessGame game, ChessGame.TeamColor perspective,
+                                         chess.ChessPosition pos,
+                                         java.util.Collection<chess.ChessMove> moves) {
         System.out.println();
         boardPrinter.printBoardWithHighlights(game, perspective, pos, moves);
         System.out.println();
